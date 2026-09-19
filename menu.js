@@ -1,4 +1,4 @@
-/* =========================================================
+1/* =========================================================
    পাতপেড়ে · MENU FILE. This is the only file you need to edit.
 
    Change a price ........ edit the number after price:
@@ -16,8 +16,8 @@
 const FIRST_ORDER_OFFER = true;
 const FEATURED = {
   show: true,
-  name: "Basanti Polao & Chicken Kasha",
-  items: ["Basanti Polao", "Chicken Kasha"],
+  name: "Fish Batter Fry",
+  items: ["Fish Batter Fry"],
   itemId: "combo"
 };
 const ORDERS_OPEN = true;
@@ -42,5 +42,5 @@ const ITEMS = [
   { id:"eggc",    group:"curry", name:"Egg Curry (2 pcs)",       price:30, icon:"🥚", },
   { id:"fishc",   group:"curry", name:"Rohu Fish Curry (70 gm)", price:40, icon:"🐟" },
   { id:"chickc",  group:"curry", name:"Chicken Curry (100 gm)",  price:60, icon:"🍗" },
-  { id:"combo",   group:"curry", name:"Basanti Polao & Chicken Kasha", price:129, icon:"🍛", alone:true }
+  { id:"combo",   group:"curry", name:"Fish Batter Fry", price:89, icon:"⭐", alone:true }
 ];
