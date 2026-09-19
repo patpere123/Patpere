@@ -14,6 +14,12 @@
 
 /* ---- Number, charges and limits ---- */
 const FIRST_ORDER_OFFER = true;
+const FEATURED = {
+  show: true,
+  name: "Basanti Polao & Chicken Kasha",
+  items: ["Basanti Polao", "Chicken Kasha"],
+  itemId: "combo"
+};
 const ORDERS_OPEN = true;
 const CLOSED_MESSAGE = "We are closed today. Please check back soon.";
 const PHONE = "917980281550";
