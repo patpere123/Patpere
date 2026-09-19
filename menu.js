@@ -14,7 +14,7 @@
 
 /* ---- Number, charges and limits ---- */
 const FIRST_ORDER_OFFER = true;
-const ORDERS_OPEN = false;
+const ORDERS_OPEN = true;
 const CLOSED_MESSAGE = "We are closed today. Please check back soon.";
 const PHONE = "917980281550";
 const PACKAGING_PER_ITEM = 10;
