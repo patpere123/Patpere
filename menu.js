@@ -30,8 +30,7 @@ const ITEMS = [
     incl:["Bhaat","Dal","Bhaja","Sabji","Rui Maach (70 gm)"] },
   { id:"chicken", group:"thali", name:"Chicken Thali",      price:150, icon:"🍗",
     incl:["Bhaat","Dal","Bhaja","Sabji","Chicken (100 gm)"] },
-  { id:"eggc",    group:"curry", name:"Egg Curry (2 pcs)",       price:30, icon:"🥚", soldOut:true },
+  { id:"eggc",    group:"curry", name:"Egg Curry (2 pcs)",       price:30, icon:"🥚", },
   { id:"fishc",   group:"curry", name:"Rohu Fish Curry (70 gm)", price:40, icon:"🐟" },
-  { id:"chickc",  group:"curry", name:"Chicken Curry (100 gm)",  price:60, icon:"🍗" },
-  {  id:"combo",  group:"curry", name:"Basanti Polao & Chicken Kasha",  price:129, icon:"🍚🍗" }
+  { id:"chickc",  group:"curry", name:"Chicken Curry (100 gm)",  price:60, icon:"🍗" }
   ];
