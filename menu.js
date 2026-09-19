@@ -13,6 +13,7 @@
    ========================================================= */
 
 /* ---- Number, charges and limits ---- */
+const FIRST_ORDER_OFFER = true;
 const PHONE = "917980281550";
 const PACKAGING_PER_ITEM = 10;
 const FIRST_ORDER_ITEM = "spveg";
