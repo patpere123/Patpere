@@ -17,8 +17,9 @@ const FIRST_ORDER_OFFER = true;
 const FEATURED = {
   show: true,
   dishes: [
-    { id:"fbf",       name:"Fish Batter Fry",    price:89, alone:true  },
-    { id:"kschingri", name:"Kachu Shak Chingri", price:99, alone:false }
+    { id:"fbf",       name:"Fish Batter Fry",    price:89, alone:true, Min:2  },
+    { id:"kschingri", name:"Kachu Shak Chingri", price:99, alone:false },
+    { id:"dktl", name:"Doi Katla", price:90, alone:false }
   ]
 };
 const ORDERS_OPEN = true;
