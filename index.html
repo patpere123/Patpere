@@ -1,4 +1,4 @@
-w<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -145,6 +145,10 @@ textarea{min-height:84px;resize:vertical}
 .fd .sm2{display:block;font-size:14px;color:var(--muted)}
 .fd .stepper button{background:var(--leaf);color:#fff}
 .toast{position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:6;max-width:596px;margin:0 auto;background:var(--leaf-deep);color:#fff;border-radius:14px;padding:12px 14px;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.pay-opts{display:grid;gap:8px;margin-top:4px}
+.pay{display:flex;align-items:center;gap:10px;padding:10px 12px;min-height:48px;border:2px solid var(--line);border-radius:14px;background:var(--card);text-align:left;font-weight:600;cursor:pointer}
+.pay input{width:22px;height:22px;accent-color:var(--leaf);flex:none}
+.linkbtn{background:none;border:0;color:var(--leaf);font:700 16px var(--body);text-decoration:underline;cursor:pointer;min-height:44px;padding:0 6px}
 /* dish name on one line across the top of each row */
 .row{row-gap:4px}
 .row h3{grid-column:1/-1;white-space:nowrap;font-size:clamp(15px,4.7vw,20px);text-align:center}
@@ -181,7 +185,7 @@ h2 small{display:block;margin:2px 0 0}
       <p class="tag" lang="bn">ঘরোয়া স্বাদ, আপনজনের মতো</p>
     </div>
     <p class="daily" lang="bn">রোজকার দুপুরে ঘরের খাবার!</p>
-    <p class="lead">Home-cooked Daily Thalis. <br>Order here, we confirm on WhatsApp.</p>
+    <p class="lead">Home-cooked daily thalis. Order here, we confirm on WhatsApp.</p>
     <div class="hours"><span><b>Pre-order only, by 10.00 am</b></span><span><b>Delivery 1.00 pm – 2.15 pm</b></span></div>
     <div class="closedbox" id="closedBox" role="status" hidden><b>Orders are closed</b><span id="closedMsg"></span></div>
     <div class="shut" id="shut" role="status" hidden><b>Ordering for tomorrow</b>Today's 10 am cut-off has passed. Orders now are delivered <span id="shutDay">tomorrow</span>, 1.00 pm – 2.15 pm.</div>
@@ -206,7 +210,7 @@ h2 small{display:block;margin:2px 0 0}
   </section>
 
   <section id="menu" aria-labelledby="menu-h">
-    <h2 id="menu-h">Our Thalis <small lang="bn">
+    <h2 id="menu-h">Our thalis <small lang="bn">আমাদের থালি</small></h2>
     <p class="sub">Pre-order only, by 10.00 am. Packing charge ₹10 extra per item. Tap + to add.</p>
     <ul class="rows" id="rows"></ul>
 
@@ -225,10 +229,10 @@ h2 small{display:block;margin:2px 0 0}
     <ul class="rows" id="rows2"></ul>
 
     <div class="alacarte">
-      <h3>Bulk Orders</h3>
-      <p>Party, office lunch or an event? <br>WhatsApp or call us for Bulk Orders.</p>
+      <h3>Bulk orders</h3>
+      <p>Party, office lunch or an event? WhatsApp or call us for bulk orders.</p>
       <div class="actions" style="margin:0">
-        <a class="btn btn-wa" id="bulkWa" href="#" target="_blank" rel="noopener" style="width:auto">WhatsApp for Bulk Order</a>
+        <a class="btn btn-wa" id="bulkWa" href="#" target="_blank" rel="noopener" style="width:auto">WhatsApp for bulk order</a>
         <a class="btn btn-ghost" href="tel:+917980281550">Call 7980281550</a>
       </div>
     </div>
@@ -239,7 +243,7 @@ h2 small{display:block;margin:2px 0 0}
   <div class="wrap">
     <a href="https://wa.me/917980281550">WhatsApp or call 7980281550</a>
     <div class="pills" lang="bn"><span>ঘরোয়া রান্না</span><span>তাজা উপকরণ</span><span>সুস্বাদু খাবার</span></div>
-    <div class="fine">Order by 10 am. Delivery 1.00 pm – 2.15 pm. <br>Packaging charge ₹10 extra.</div>
+    <div class="fine">Bulk orders: WhatsApp or call. Order by 10 am. Delivery 1.00 pm – 2.15 pm. Packaging charge ₹10 extra.</div>
   </div>
 </footer>
 
@@ -271,6 +275,19 @@ h2 small{display:block;margin:2px 0 0}
     <textarea id="addr" autocomplete="street-address" placeholder="Flat / house no., building, street, landmark"></textarea>
     <label class="f" for="notes">Notes for the kitchen (optional)</label>
     <input type="text" id="notes" placeholder="e.g. less spicy">
+    <div id="payBox" hidden>
+      <label class="f">How will you pay?</label>
+      <div class="pay-opts">
+        <label class="pay"><input type="radio" name="pay" id="payNow" value="upi-now"><span>Pay now by UPI</span></label>
+        <label class="pay"><input type="radio" name="pay" id="payCash" value="cod-cash"><span>Cash on delivery</span></label>
+        <label class="pay"><input type="radio" name="pay" id="payUpiCod" value="cod-upi"><span>UPI on delivery</span></label>
+      </div>
+      <div id="upiNow" hidden>
+        <a class="btn btn-primary" id="upiPay" href="#" style="width:100%;margin-top:10px">Pay by UPI</a>
+        <p class="note">UPI ID: <b id="upiId"></b> <button type="button" class="linkbtn" id="upiCopy">Copy</button></p>
+        <p class="note">Your UPI app will show the account holder's name, not "Patpere". That is our payment account. After paying, tap "Send order on WhatsApp" below and share the payment screenshot in the chat.</p>
+      </div>
+    </div>
     <p class="err" id="err" role="alert"></p>
     <button type="button" class="btn btn-wa" id="send">Send order on WhatsApp</button>
     <div id="fallback" hidden>
@@ -456,6 +473,7 @@ function fillSheet(){
   const ok = c.valid;
   $("send").disabled = !ok;
   if (!ok) $("err").textContent = c.problem;
+  updatePay(c);
 }
 
 $("openCart").addEventListener("click", () => { $("err").textContent = ""; $("fallback").hidden = true; fillSheet(); $("sheet").showModal(); if (STOCK_ON) fetchStock(); });
@@ -476,6 +494,13 @@ $("send").addEventListener("click", () => {
   const notes = $("notes").value.trim();
   if (!name){ $("err").textContent = "Please enter your name."; $("name").focus(); return; }
   if (!addr){ $("err").textContent = "Please enter your delivery address."; $("addr").focus(); return; }
+  let payLine = "";
+  if (PAY_ON) {
+    if ($("payNow").checked) payLine = "Payment: UPI, paid in advance (I will send the screenshot here)";
+    else if ($("payCash").checked) payLine = "Payment: Cash on delivery";
+    else if ($("payUpiCod").checked) payLine = "Payment: UPI on delivery";
+    else { $("err").textContent = "Please choose how you will pay."; return; }
+  }
   try { localStorage.setItem("patpere-customer", JSON.stringify({name, addr})); } catch(e){}
   const c = calc();
   const lines = ITEMS.filter(i => qty[i.id]).map(i => {
@@ -490,6 +515,7 @@ $("send").addEventListener("click", () => {
     "Food: " + rupee(c.food),
     "Packaging: " + rupee(c.pack),
     "Total: " + rupee(c.total),
+    payLine,
     "",
     "Name: " + name,
     "Address: " + addr,
@@ -609,6 +635,22 @@ if (ORDERS_CLOSED) {
   });
   $("featured").hidden = false;
 })();
+// ---- Payment choice (only when UPI_ID is set in menu.js) ----
+const PAY_ON = (typeof UPI_ID !== "undefined" && !!UPI_ID);
+function updatePay(c){
+  $("payBox").hidden = !PAY_ON;
+  if (!PAY_ON) return;
+  const name = (typeof UPI_NAME !== "undefined" && UPI_NAME) ? UPI_NAME : "Patpere";
+  $("upiPay").href = "upi://pay?pa=" + UPI_ID + "&pn=" + encodeURIComponent(name) + "&am=" + c.total.toFixed(2) + "&cu=INR&tn=" + encodeURIComponent("Patpere order");
+  $("upiPay").textContent = "Pay " + rupee(c.total) + " by UPI";
+  $("upiId").textContent = UPI_ID;
+  $("upiNow").hidden = !$("payNow").checked;
+}
+["payNow", "payCash", "payUpiCod"].forEach(id => $(id).addEventListener("change", () => updatePay(calc())));
+$("upiCopy").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(UPI_ID); $("upiCopy").textContent = "Copied"; }
+  catch(e){ $("upiCopy").textContent = "Select and copy the ID"; }
+});
 // ---- Live stock (only when STOCK_URL in menu.js points to the Google Sheet script) ----
 let stockSeq = 0, stockApplied = 0, noteTimer = null;
 function showNote(text){
