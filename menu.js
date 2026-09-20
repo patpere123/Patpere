@@ -24,6 +24,8 @@ const FEATURED = {
 };
 const ORDERS_OPEN = true;
 const CLOSED_MESSAGE = "We are closed today. Please check back soon.";
+const UPI_ID = "parna.1707-1@oksbi";
+const UPI_NAME = "Patpere";
 const PHONE = "917980281550";
 const PACKAGING_PER_ITEM = 10;
 const FIRST_ORDER_ITEM = "spveg";
