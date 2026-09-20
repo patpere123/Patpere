@@ -144,6 +144,7 @@ textarea{min-height:84px;resize:vertical}
 .fd .price{display:block;font:800 26px/1.1 var(--display);color:var(--chilli)}
 .fd .sm2{display:block;font-size:14px;color:var(--muted)}
 .fd .stepper button{background:var(--leaf);color:#fff}
+.toast{position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:6;max-width:596px;margin:0 auto;background:var(--leaf-deep);color:#fff;border-radius:14px;padding:12px 14px;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.3)}
 /* dish name on one line across the top of each row */
 .row{row-gap:4px}
 .row h3{grid-column:1/-1;white-space:nowrap;font-size:clamp(15px,4.7vw,20px);text-align:center}
@@ -242,6 +243,8 @@ h2 small{display:block;margin:2px 0 0}
   </div>
 </footer>
 
+<div class="toast" id="stockNote" role="status" hidden></div>
+
 <div class="bar" id="bar">
   <button type="button" id="openCart" aria-haspopup="dialog">
     <span id="barCount">0 items</span><span>Review order · <span id="barTotal">₹0</span></span>
@@ -298,6 +301,8 @@ if (typeof FEATURED !== "undefined" && FEATURED && FEATURED.show !== false && Ar
     ITEMS.push({ id: id, group: "featured", name: d.name, price: Number(d.price) || 0, icon: "\u2b50", alone: d.alone === true, max: d.max, minAlone: d.minAlone, maxAlone: d.maxAlone, maxWithThali: d.maxWithThali, soldOut: d.soldOut });
   });
 }
+const STOCK_ON = (typeof STOCK_URL !== "undefined" && !!STOCK_URL);
+const stockLeft = {};   // id -> portions left today (only dishes limited in the Stock sheet)
 const ORDERS_CLOSED = (typeof ORDERS_OPEN !== "undefined" && ORDERS_OPEN === false);
 // Limits for a dish.
 //   max:N            most of this dish in one order, alone or with a thali
@@ -320,7 +325,9 @@ const limitOf = i => {
   if (i.soldOut || ORDERS_CLOSED) return 0;
   const base = hasThali() ? thaliMaxOf(i) : aloneMaxOf(i);
   const el = document.getElementById("first");
-  return (i.id === FIRST_ORDER_ITEM && el && el.checked) ? base + 1 : base;
+  let lim = (i.id === FIRST_ORDER_ITEM && el && el.checked) ? base + 1 : base;
+  if (stockLeft[i.id] !== undefined) lim = Math.min(lim, Math.max(0, stockLeft[i.id]));   // never more than what is left
+  return lim;
 };
 
 const qty = {}; ITEMS.forEach(i => qty[i.id] = 0);
@@ -329,25 +336,38 @@ const rupee = n => "₹" + n;
 
 // Menu rows
 const rows = $("rows");
-ITEMS.forEach(i => {
-  if (i.group === "featured") return;
-  const li = document.createElement("li");
-  const off = i.soldOut || ORDERS_CLOSED;
-  li.className = "row " + (i.group === "curry" ? "curry" : i.id) + (off ? " sold" : "");
-  const ctrl = off
-    ? '<span class="soldtag">' + (i.soldOut ? "Sold out today" : "Closed") + '</span>'
-    : '<div class="stepper">' +
-        '<button type="button" aria-label="Remove one ' + i.name + '" data-id="' + i.id + '" data-d="-1">−</button>' +
-        '<span class="qty" id="q-' + i.id + '" aria-live="polite">0</span>' +
-        '<button type="button" aria-label="Add one ' + i.name + '" data-id="' + i.id + '" data-d="1">+</button>' +
-      '</div>';
-  li.innerHTML =
-    '<h3>' + i.name + '</h3>' +
+const rowEls = {}, fdEls = {}, outState = {};
+const isOut = i => i.soldOut || ORDERS_CLOSED || (stockLeft[i.id] !== undefined && stockLeft[i.id] <= 0);
+const outText = i => (i.soldOut || (stockLeft[i.id] !== undefined && stockLeft[i.id] <= 0)) ? "Sold out today" : "Closed";
+const stepperHTML = i =>
+  '<div class="stepper">' +
+    '<button type="button" aria-label="Remove one ' + i.name + '" data-id="' + i.id + '" data-d="-1">−</button>' +
+    '<span class="qty" id="q-' + i.id + '" aria-live="polite">0</span>' +
+    '<button type="button" aria-label="Add one ' + i.name + '" data-id="' + i.id + '" data-d="1">+</button>' +
+  '</div>';
+const rowClass = i => "row " + (i.group === "curry" ? "curry" : i.id) + (isOut(i) ? " sold" : "");
+const rowHTML = i => {
+  const off = isOut(i);
+  return '<h3>' + i.name + '</h3>' +
     '<span class="ico" aria-hidden="true">' + i.icon + '</span>' +
     '<div class="mid"><span class="price">' + rupee(i.price) + '</span>' +
       (off ? '' : '<span class="sm2" id="max-' + i.id + '">Max ' + limitOf(i) + ' per order</span>') + '</div>' +
-    ctrl +
+    (off ? '<span class="soldtag">' + outText(i) + '</span>' : stepperHTML(i)) +
     (i.incl ? '<details class="incl"><summary>What\'s on the plate</summary><ul>' + i.incl.map(x => '<li>' + x + '</li>').join('') + '</ul></details>' : '');
+};
+const fdHTML = i => {
+  const off = isOut(i);
+  return '<h3>' + i.name + '</h3><div class="fd-row"><div><span class="price">' + rupee(i.price) + '</span>' +
+    (off ? '' : '<span class="sm2" id="max-' + i.id + '">Max ' + limitOf(i) + ' per order</span>') +
+    ((!i.alone && !off) ? '<span class="sm2">Add this to an order with a thali</span>' : '') + '</div>' +
+    (off ? '<span class="soldtag">' + outText(i) + '</span>' : stepperHTML(i)) + '</div>';
+};
+ITEMS.forEach(i => {
+  if (i.group === "featured") return;
+  const li = document.createElement("li");
+  li.className = rowClass(i);
+  li.innerHTML = rowHTML(i);
+  rowEls[i.id] = li;
   (i.group === "curry" ? $("rows2") : rows).appendChild(li);
 });
 const onStep = e => {
@@ -408,13 +428,14 @@ function render(){
       : (i.id === FIRST_ORDER_ITEM && $("first").checked)
       ? "Max " + (limitOf(i) - 1) + " + your ₹" + FIRST_ORDER_PRICE + " first-order meal"
       : "Max " + limitOf(i) + " per order";
+    if (m && stockLeft[i.id] !== undefined && stockLeft[i.id] <= 10) m.textContent += " · only " + stockLeft[i.id] + " left";
   });
   const c = calc();
   $("firstHint").textContent = ($("first").checked && qty[FIRST_ORDER_ITEM] === 0) ? "Add a Special Veg Thali above to use this offer." : "";
   $("barCount").textContent = (c.count > 0 && !c.valid) ? c.barHint : c.count + (c.count === 1 ? " item" : " items");
   $("barTotal").textContent = rupee(c.total);
   $("bar").classList.toggle("on", c.count > 0);
-  if (c.count === 0 && $("sheet").open) $("sheet").close();
+  if (c.count === 0 && $("sheet").open && $("fallback").hidden) $("sheet").close();
 }
 
 function fillSheet(){
@@ -437,7 +458,7 @@ function fillSheet(){
   if (!ok) $("err").textContent = c.problem;
 }
 
-$("openCart").addEventListener("click", () => { $("err").textContent = ""; fillSheet(); $("sheet").showModal(); });
+$("openCart").addEventListener("click", () => { $("err").textContent = ""; $("fallback").hidden = true; fillSheet(); $("sheet").showModal(); if (STOCK_ON) fetchStock(); });
 $("closeCart").addEventListener("click", () => $("sheet").close());
 $("sheet").addEventListener("click", e => { if (e.target === $("sheet")) $("sheet").close(); });
 
@@ -477,18 +498,48 @@ $("send").addEventListener("click", () => {
     c.useSpecial ? "First order: yes" : ""
   ].filter((l, idx, a) => l !== "" || (a[idx-1] !== "" && idx !== a.length-1)).join("\n");
   const url = "https://wa.me/" + PHONE + "?text=" + encodeURIComponent(msg);
-  let w = null;
-  try { w = window.open(url, "_blank"); } catch(e){}
-  if (!w) {
-    // Popup blocked: show the order text so it can be copied and pasted into WhatsApp
-    $("fbText").value = msg;
-    $("fbLink").href = url;
-    $("fallback").hidden = false;
-    $("err").textContent = "WhatsApp didn't open. Copy the order below and send it to 7980281550.";
-  }
-  // Remember on this phone that an order was sent, so the first-order offer stops showing
-  try { localStorage.setItem("patpere-ordered", "1"); } catch(e){}
-  hideOffer();
+  const finish = (pre, reserved) => {
+    let w = null;
+    if (pre) { try { pre.location.href = url; w = pre; } catch(e){} }
+    if (!w) { try { w = window.open(url, "_blank"); } catch(e){} }
+    if (!w) {
+      // Popup blocked: show the order text so it can be copied and pasted into WhatsApp
+      $("fbText").value = msg;
+      $("fbLink").href = url;
+      $("fallback").hidden = false;
+      $("err").textContent = "WhatsApp didn't open. Copy the order below and send it to 7980281550.";
+    }
+    // Remember on this phone that an order was sent, so the first-order offer stops showing
+    try { localStorage.setItem("patpere-ordered", "1"); } catch(e){}
+    hideOffer();
+    if (reserved) {
+      // Stock was taken for this order, so start a fresh cart: it must not be sent twice
+      ITEMS.forEach(i => { qty[i.id] = 0; });
+      refreshOutStates();
+      if (w) { $("sheet").close(); showNote("Order sent on WhatsApp. Thank you!"); }
+      render();
+    }
+  };
+  if (!STOCK_ON) { finish(null, false); return; }
+  $("send").disabled = true;
+  $("err").textContent = "Checking stock\u2026";
+  let pre = null;
+  try { pre = window.open("", "_blank"); } catch(e){}
+  reserveStock().then(res => {
+    if (res && res.ok === false && res.short) {
+      // Someone else took the stock first: update the counts and let the customer review
+      if (pre) { try { pre.close(); } catch(e){} }
+      applyStock(res, true);
+      fillSheet();
+      const names = Object.keys(res.short).map(id => { const it = ITEMS.find(x => x.id === id); return (it ? it.name : id) + " (" + res.short[id] + " left)"; });
+      $("err").textContent = "Sorry, not enough stock: " + names.join(", ") + ". We have updated your order. Please check it and send again.";
+      return;
+    }
+    if (res && res.ok === true) { setStock(res); finish(pre, true); return; }
+    // Could not reach the stock sheet: do not lose the order, send it anyway
+    finish(pre, false);
+    $("send").disabled = false;
+  });
 });
 $("fbCopy").addEventListener("click", async () => {
   try { await navigator.clipboard.writeText($("fbText").value); $("fbCopy").textContent = "Copied"; }
@@ -520,18 +571,10 @@ if (ORDERS_CLOSED) {
     if (FEATURED.name) { $("featName").textContent = FEATURED.name; } else { $("featName").style.display = "none"; }
     ["featItems", "featPrice", "featAdd"].forEach(x => { $(x).style.display = "none"; });
     dishes.forEach(i => {
-      const off = i.soldOut || ORDERS_CLOSED;
       const div = document.createElement("div");
       div.className = "fd";
-      div.innerHTML = '<h3>' + i.name + '</h3><div class="fd-row"><div><span class="price">' + rupee(i.price) + '</span>' +
-        (off ? '' : '<span class="sm2" id="max-' + i.id + '">Max ' + limitOf(i) + ' per order</span>') +
-        ((!i.alone && !off) ? '<span class="sm2">Add this to an order with a thali</span>' : '') + '</div>' +
-        (off ? '<span class="soldtag">' + (i.soldOut ? "Sold out today" : "Closed") + '</span>'
-             : '<div class="stepper">' +
-                 '<button type="button" aria-label="Remove one ' + i.name + '" data-id="' + i.id + '" data-d="-1">\u2212</button>' +
-                 '<span class="qty" id="q-' + i.id + '" aria-live="polite">0</span>' +
-                 '<button type="button" aria-label="Add one ' + i.name + '" data-id="' + i.id + '" data-d="1">+</button>' +
-               '</div>') + '</div>';
+      div.innerHTML = fdHTML(i);
+      fdEls[i.id] = div;
       $("featDishes").appendChild(div);
     });
     $("featDishes").addEventListener("click", onStep);
@@ -556,6 +599,7 @@ if (ORDERS_CLOSED) {
   else if (item.soldOut) { btn.style.display = "none"; $("featNote").textContent = "Sold out today"; }
   else if (ORDERS_CLOSED) { btn.style.display = "none"; }
   else btn.addEventListener("click", () => {
+    if (isOut(item)) { $("featNote").textContent = "Sold out today"; return; }
     if (qty[item.id] < limitOf(item)) {
       qty[item.id]++; render();
       $("featNote").textContent = "Added. You have " + qty[item.id] + " in your order.";
@@ -565,6 +609,65 @@ if (ORDERS_CLOSED) {
   });
   $("featured").hidden = false;
 })();
+// ---- Live stock (only when STOCK_URL in menu.js points to the Google Sheet script) ----
+let stockSeq = 0, stockApplied = 0, noteTimer = null;
+function showNote(text){
+  const el = $("stockNote"); el.textContent = text; el.hidden = false;
+  clearTimeout(noteTimer); noteTimer = setTimeout(() => { el.hidden = true; }, 9000);
+}
+function refreshOutStates(){
+  ITEMS.forEach(i => {
+    const now = isOut(i);
+    if (outState[i.id] === now) return;
+    outState[i.id] = now;
+    if (i.group === "featured") { if (fdEls[i.id]) fdEls[i.id].innerHTML = fdHTML(i); }
+    else if (rowEls[i.id]) { rowEls[i.id].className = rowClass(i); rowEls[i.id].innerHTML = rowHTML(i); }
+  });
+}
+function setStock(data){
+  if (!data || !data.stock) return;
+  Object.keys(stockLeft).forEach(k => { delete stockLeft[k]; });
+  Object.keys(data.stock).forEach(k => {
+    const v = data.stock[k];
+    if (v !== null && v !== "" && !isNaN(Number(v))) stockLeft[k] = Math.max(0, Number(v));
+  });
+}
+function applyStock(data, quiet){
+  const before = ITEMS.reduce((n, i) => n + qty[i.id], 0);
+  setStock(data);
+  refreshOutStates();
+  render();                       // also trims the cart to what is left
+  const after = ITEMS.reduce((n, i) => n + qty[i.id], 0);
+  if (after < before && !quiet) {
+    const msg = "Stock has changed, so we updated your order.";
+    showNote(msg);
+    if ($("sheet").open) { fillSheet(); $("err").textContent = msg; }
+  }
+}
+async function fetchStock(){
+  if (!STOCK_ON) return;
+  const my = ++stockSeq;
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), 8000);
+  try {
+    const r = await fetch(STOCK_URL + "?action=stock&t=" + Date.now(), { cache: "no-store", signal: ctl.signal });
+    clearTimeout(t);
+    const data = await r.json();
+    if (data && data.ok && my >= stockApplied) { stockApplied = my; applyStock(data); }
+  } catch(e){ clearTimeout(t); }
+}
+async function reserveStock(){
+  const parts = ITEMS.filter(i => qty[i.id] > 0).map(i => encodeURIComponent(i.id) + ":" + qty[i.id]);
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), 10000);
+  try {
+    const r = await fetch(STOCK_URL + "?action=reserve&items=" + parts.join(",") + "&t=" + Date.now(), { cache: "no-store", signal: ctl.signal });
+    clearTimeout(t);
+    const res = await r.json();
+    stockApplied = ++stockSeq;
+    return res;
+  } catch(e){ clearTimeout(t); return null; }   // null = could not reach the sheet
+}
 // After 10 am Indian time, orders are taken for tomorrow
 let deliveryText = "today, 1.00 pm – 2.15 pm";
 function applyCutoff(){
@@ -588,6 +691,12 @@ function applyCutoff(){
 applyCutoff();
 setInterval(applyCutoff, 60000);
 $("bulkWa").href = "https://wa.me/" + PHONE + "?text=" + encodeURIComponent("নমস্কার পাতপেড়ে! আমি বাল্ক অর্ডার সম্পর্কে জানতে চাই।");
+ITEMS.forEach(i => { outState[i.id] = isOut(i); });
+if (STOCK_ON) {
+  fetchStock();
+  setInterval(fetchStock, 45000);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") fetchStock(); });
+}
 </script>
 </body>
 </html>
