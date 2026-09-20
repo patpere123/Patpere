@@ -351,8 +351,11 @@ function calc(){
   const useSpecial = $("first").checked && qty[FIRST_ORDER_ITEM] > 0;
   if (useSpecial) food -= (sp.price - FIRST_ORDER_PRICE);
   const pack = count * PACKAGING_PER_ITEM;
-  const thalis = ITEMS.filter(i => i.group === "thali" || i.alone).reduce((n,i) => n + qty[i.id], 0);
-  return { count, thalis, food, pack, total: food + pack, useSpecial };
+  const thalis = ITEMS.filter(i => i.group === "thali").reduce((n,i) => n + qty[i.id], 0);
+  // Items that are not thalis and not marked alone:true can only be ordered together with a real thali
+  const needsThali = ITEMS.some(i => qty[i.id] > 0 && i.group !== "thali" && !i.alone);
+  const valid = count > 0 && (thalis > 0 || !needsThali);
+  return { count, thalis, valid, food, pack, total: food + pack, useSpecial };
 }
 
 function render(){
@@ -368,7 +371,7 @@ function render(){
   });
   const c = calc();
   $("firstHint").textContent = ($("first").checked && qty[FIRST_ORDER_ITEM] === 0) ? "Add a Special Veg Thali above to use this offer." : "";
-  $("barCount").textContent = (c.count > 0 && c.thalis === 0) ? "Add a thali to order" : c.count + (c.count === 1 ? " item" : " items");
+  $("barCount").textContent = (c.count > 0 && !c.valid) ? "Add a thali to order" : c.count + (c.count === 1 ? " item" : " items");
   $("barTotal").textContent = rupee(c.total);
   $("bar").classList.toggle("on", c.count > 0);
   if (c.count === 0 && $("sheet").open) $("sheet").close();
@@ -389,9 +392,9 @@ function fillSheet(){
   $("tPackLabel").textContent = "Packaging (" + c.count + " × ₹" + PACKAGING_PER_ITEM + ")";
   $("tPack").textContent = rupee(c.pack);
   $("tTotal").textContent = rupee(c.total);
-  const ok = c.thalis > 0;
+  const ok = c.valid;
   $("send").disabled = !ok;
-  if (!ok) $("err").textContent = "Curries are sold with a thali. Add at least one thali to send your order.";
+  if (!ok) $("err").textContent = "Some items in your cart can only be ordered with a thali. Add at least one thali to send your order.";
 }
 
 $("openCart").addEventListener("click", () => { $("err").textContent = ""; fillSheet(); $("sheet").showModal(); });
@@ -407,7 +410,7 @@ try {
 
 $("send").addEventListener("click", () => {
   if (ORDERS_CLOSED) return;
-  if (calc().thalis === 0){ $("err").textContent = "Curries are sold with a thali. Add at least one thali to send your order."; return; }
+  if (!calc().valid){ $("err").textContent = "Some items in your cart can only be ordered with a thali. Add at least one thali to send your order."; return; }
   const name = $("name").value.trim(), addr = $("addr").value.trim();
   const notes = $("notes").value.trim();
   if (!name){ $("err").textContent = "Please enter your name."; $("name").focus(); return; }
