@@ -302,8 +302,7 @@ const limitLabel = i => {
   const withThali = i.maxWithThali !== undefined ? i.maxWithThali : base;
   if (i.minAlone !== undefined) {
     if (i.maxAlone !== undefined) return "Min " + i.minAlone + " to " + i.maxAlone + " on its own, up to " + withThali + " with a thali";
-    if (i.maxWithThali !== undefined) return "Min " + i.minAlone + " if ordered alone, max " + withThali;
-    return "Min " + i.minAlone + " if ordered alone, max " + base;
+    return "Min " + i.minAlone + " if ordered alone, max " + withThali + " with a thali";
   }
   const alone = i.maxAlone !== undefined ? i.maxAlone : base;
   return "Max " + alone + " on its own, " + withThali + " with a thali";
@@ -315,7 +314,7 @@ const limitOf = i => {
   // Optional: maxAlone = limit when there is no thali in the order, maxWithThali = limit when there is one
   if (i.maxAlone !== undefined || i.maxWithThali !== undefined) {
     base = hasThali() ? (i.maxWithThali !== undefined ? i.maxWithThali : base)
-                      : (i.maxAlone !== undefined ? i.maxAlone : (i.minAlone !== undefined && i.maxWithThali !== undefined ? i.maxWithThali : base));
+                      : (i.maxAlone !== undefined ? i.maxAlone : (i.minAlone !== undefined ? Math.max(20, i.minAlone) : base));
   }
   const el = document.getElementById("first");
   return (i.id === FIRST_ORDER_ITEM && el && el.checked) ? base + 1 : base;
