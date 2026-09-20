@@ -179,7 +179,7 @@ h2 small{display:block;margin:2px 0 0}
       <p class="tag" lang="bn">ঘরোয়া স্বাদ, আপনজনের মতো</p>
     </div>
     <p class="daily" lang="bn">রোজকার দুপুরে ঘরের খাবার!</p>
-    <p class="lead">Home-cooked daily thalis.<br> Order here, we confirm on WhatsApp.</p>
+    <p class="lead">Home-cooked daily thalis. Order here, we confirm on WhatsApp.</p>
     <div class="hours"><span><b>Pre-order only, by 10.00 am</b></span><span><b>Delivery 1.00 pm – 2.15 pm</b></span></div>
     <div class="closedbox" id="closedBox" role="status" hidden><b>Orders are closed</b><span id="closedMsg"></span></div>
     <div class="shut" id="shut" role="status" hidden><b>Ordering for tomorrow</b>Today's 10 am cut-off has passed. Orders now are delivered <span id="shutDay">tomorrow</span>, 1.00 pm – 2.15 pm.</div>
@@ -203,7 +203,7 @@ h2 small{display:block;margin:2px 0 0}
   </section>
 
   <section id="menu" aria-labelledby="menu-h">
-    <h2 id="menu-h">Our Thalis <small lang="bn">
+    <h2 id="menu-h">Our thalis <small lang="bn">আমাদের থালি</small></h2>
     <p class="sub">Pre-order only, by 10.00 am. Packing charge ₹10 extra per item. Tap + to add.</p>
     <ul class="rows" id="rows"></ul>
 
@@ -223,7 +223,7 @@ h2 small{display:block;margin:2px 0 0}
 
     <div class="alacarte">
       <h3>Bulk orders</h3>
-      <p>Party, office lunch or an event?<br> WhatsApp or call us for bulk orders.</p>
+      <p>Party, office lunch or an event? WhatsApp or call us for bulk orders.</p>
       <div class="actions" style="margin:0">
         <a class="btn btn-wa" id="bulkWa" href="#" target="_blank" rel="noopener" style="width:auto">WhatsApp for bulk order</a>
         <a class="btn btn-ghost" href="tel:+917980281550">Call 7980281550</a>
@@ -236,7 +236,7 @@ h2 small{display:block;margin:2px 0 0}
   <div class="wrap">
     <a href="https://wa.me/917980281550">WhatsApp or call 7980281550</a>
     <div class="pills" lang="bn"><span>ঘরোয়া রান্না</span><span>তাজা উপকরণ</span><span>সুস্বাদু খাবার</span></div>
-    <div class="fine">Order by 10 am. Delivery 1.00 pm – 2.15 pm.<br> Packaging charge ₹10 extra.</div>
+    <div class="fine">Bulk orders: WhatsApp or call. Order by 10 am. Delivery 1.00 pm – 2.15 pm. Packaging charge ₹10 extra.</div>
   </div>
 </footer>
 
@@ -293,13 +293,30 @@ if (typeof FEATURED !== "undefined" && FEATURED && FEATURED.show !== false && Ar
     if (!d || !d.name) return;
     let id = String(d.id || ("featured" + (n + 1))).replace(/\s+/g, "");
     if (ITEMS.some(x => x.id === id)) id = id + "-" + (n + 1);
-    ITEMS.push({ id: id, group: "featured", name: d.name, price: Number(d.price) || 0, icon: "\u2b50", alone: d.alone === true, max: d.max, soldOut: d.soldOut });
+    ITEMS.push({ id: id, group: "featured", name: d.name, price: Number(d.price) || 0, icon: "\u2b50", alone: d.alone === true, max: d.max, minAlone: d.minAlone, maxAlone: d.maxAlone, maxWithThali: d.maxWithThali, soldOut: d.soldOut });
   });
 }
 const ORDERS_CLOSED = (typeof ORDERS_OPEN !== "undefined" && ORDERS_OPEN === false);
+const limitLabel = i => {
+  const base = i.max || MAX_PER_ITEM;
+  const withThali = i.maxWithThali !== undefined ? i.maxWithThali : base;
+  if (i.minAlone !== undefined) {
+    if (i.maxAlone !== undefined) return "Min " + i.minAlone + " to " + i.maxAlone + " on its own, up to " + withThali + " with a thali";
+    if (i.maxWithThali !== undefined) return "Min " + i.minAlone + " if ordered alone, max " + withThali;
+    return "Min " + i.minAlone + " if ordered alone, max " + base;
+  }
+  const alone = i.maxAlone !== undefined ? i.maxAlone : base;
+  return "Max " + alone + " on its own, " + withThali + " with a thali";
+};
+const hasThali = () => ITEMS.some(x => x.group === "thali" && qty[x.id] > 0);
 const limitOf = i => {
   if (i.soldOut || ORDERS_CLOSED) return 0;
-  const base = i.max || MAX_PER_ITEM;
+  let base = i.max || MAX_PER_ITEM;
+  // Optional: maxAlone = limit when there is no thali in the order, maxWithThali = limit when there is one
+  if (i.maxAlone !== undefined || i.maxWithThali !== undefined) {
+    base = hasThali() ? (i.maxWithThali !== undefined ? i.maxWithThali : base)
+                      : (i.maxAlone !== undefined ? i.maxAlone : (i.minAlone !== undefined && i.maxWithThali !== undefined ? i.maxWithThali : base));
+  }
   const el = document.getElementById("first");
   return (i.id === FIRST_ORDER_ITEM && el && el.checked) ? base + 1 : base;
 };
@@ -334,7 +351,12 @@ const onStep = e => {
   const b = e.target.closest("button[data-id]"); if (!b) return;
   const id = b.dataset.id;
   const item = ITEMS.find(x => x.id === id);
-  qty[id] = Math.max(0, Math.min(limitOf(item), qty[id] + Number(b.dataset.d)));
+  let next = qty[id] + Number(b.dataset.d);
+  if (item.minAlone && !hasThali()) {
+    if (b.dataset.d === "1" && qty[id] === 0) next = item.minAlone;
+    if (b.dataset.d === "-1" && qty[id] <= item.minAlone) next = 0;
+  }
+  qty[id] = Math.max(0, Math.min(limitOf(item), next));
   render();
 };
 rows.addEventListener("click", onStep);
@@ -354,24 +376,37 @@ function calc(){
   const thalis = ITEMS.filter(i => i.group === "thali").reduce((n,i) => n + qty[i.id], 0);
   // Items that are not thalis and not marked alone:true can only be ordered together with a real thali
   const needsThali = ITEMS.some(i => qty[i.id] > 0 && i.group !== "thali" && !i.alone);
-  const valid = count > 0 && (thalis > 0 || !needsThali);
-  return { count, thalis, valid, food, pack, total: food + pack, useSpecial };
+  let problem = "", barHint = "";
+  if (count > 0 && thalis === 0) {
+    if (needsThali) {
+      problem = "Some items in your cart can only be ordered with a thali. Add at least one thali to send your order."; barHint = "Add a thali to order";
+    } else {
+      // minAlone: the least a customer must order of a dish when there is no thali in the order
+      const short = ITEMS.find(i => i.minAlone && qty[i.id] > 0 && qty[i.id] < i.minAlone);
+      if (short) { problem = short.name + ": please order at least " + short.minAlone + " when ordering on its own, or add a thali."; barHint = "Add more or a thali"; }
+    }
+  }
+  const valid = count > 0 && !problem;
+  return { count, thalis, valid, problem, barHint, food, pack, total: food + pack, useSpecial };
 }
 
 function render(){
+  ITEMS.forEach(i => { const l = limitOf(i); if (qty[i.id] > l) qty[i.id] = l; });
   ITEMS.forEach(i => {
     const q = $("q-" + i.id); if (!q) return;
     q.textContent = qty[i.id];
     const plus = document.querySelector('button[data-id="' + i.id + '"][data-d="1"]');
     if (plus) plus.disabled = qty[i.id] >= limitOf(i);
     const m = $("max-" + i.id);
-    if (m) m.textContent = (i.id === FIRST_ORDER_ITEM && $("first").checked)
+    if (m) m.textContent = (i.maxAlone !== undefined || i.maxWithThali !== undefined || i.minAlone !== undefined)
+      ? limitLabel(i)
+      : (i.id === FIRST_ORDER_ITEM && $("first").checked)
       ? "Max " + (limitOf(i) - 1) + " + your ₹" + FIRST_ORDER_PRICE + " first-order meal"
       : "Max " + limitOf(i) + " per order";
   });
   const c = calc();
   $("firstHint").textContent = ($("first").checked && qty[FIRST_ORDER_ITEM] === 0) ? "Add a Special Veg Thali above to use this offer." : "";
-  $("barCount").textContent = (c.count > 0 && !c.valid) ? "Add a thali to order" : c.count + (c.count === 1 ? " item" : " items");
+  $("barCount").textContent = (c.count > 0 && !c.valid) ? c.barHint : c.count + (c.count === 1 ? " item" : " items");
   $("barTotal").textContent = rupee(c.total);
   $("bar").classList.toggle("on", c.count > 0);
   if (c.count === 0 && $("sheet").open) $("sheet").close();
@@ -394,7 +429,7 @@ function fillSheet(){
   $("tTotal").textContent = rupee(c.total);
   const ok = c.valid;
   $("send").disabled = !ok;
-  if (!ok) $("err").textContent = "Some items in your cart can only be ordered with a thali. Add at least one thali to send your order.";
+  if (!ok) $("err").textContent = c.problem;
 }
 
 $("openCart").addEventListener("click", () => { $("err").textContent = ""; fillSheet(); $("sheet").showModal(); });
@@ -410,7 +445,7 @@ try {
 
 $("send").addEventListener("click", () => {
   if (ORDERS_CLOSED) return;
-  if (!calc().valid){ $("err").textContent = "Some items in your cart can only be ordered with a thali. Add at least one thali to send your order."; return; }
+  if (!calc().valid){ $("err").textContent = calc().problem; return; }
   const name = $("name").value.trim(), addr = $("addr").value.trim();
   const notes = $("notes").value.trim();
   if (!name){ $("err").textContent = "Please enter your name."; $("name").focus(); return; }
