@@ -136,6 +136,7 @@ textarea{min-height:84px;resize:vertical}
 .feat h2{margin:10px 0 2px;font-size:28px;line-height:1.15}
 .feat-items{margin:2px 0 0;color:var(--muted);font-size:17px}
 .feat-price{margin:8px 0 10px;font:800 32px/1 var(--display);color:var(--chilli)}
+.feat-nopack{margin:12px 0 0;font-weight:600;color:var(--leaf);font-size:16px}
 .feat-note{margin:8px 0 0;font-size:15px;color:var(--muted);min-height:20px}
 .fd{margin:12px 0 0;padding:12px 14px;border-radius:20px;background:var(--card);border:1px solid var(--line)}
 .fd h3{margin:0;font:700 20px/1.2 var(--display);color:var(--ink)}
@@ -199,6 +200,7 @@ h2 small{display:block;margin:2px 0 0}
     <div id="featDishes"></div>
     <div class="feat-price" id="featPrice"></div>
     <button type="button" class="btn btn-primary" id="featAdd">Add to my order</button>
+    <p class="feat-nopack" id="featPack" hidden>No packing charge on featured dishes.</p>
     <p class="feat-note" id="featNote" role="status"></p>
   </section>
 
@@ -297,28 +299,30 @@ if (typeof FEATURED !== "undefined" && FEATURED && FEATURED.show !== false && Ar
   });
 }
 const ORDERS_CLOSED = (typeof ORDERS_OPEN !== "undefined" && ORDERS_OPEN === false);
-const limitLabel = i => {
-  const base = i.max || MAX_PER_ITEM;
-  const withThali = i.maxWithThali !== undefined ? i.maxWithThali : base;
-  if (i.minAlone !== undefined) {
-    if (i.maxAlone !== undefined) return "Min " + i.minAlone + " to " + i.maxAlone + " on its own, up to " + withThali + " with a thali";
-    return "Min " + i.minAlone + " if ordered alone, max " + withThali + " with a thali";
-  }
-  const alone = i.maxAlone !== undefined ? i.maxAlone : base;
-  return "Max " + alone + " on its own, " + withThali + " with a thali";
-};
+// Limits for a dish.
+//   max:N            most of this dish in one order, alone or with a thali
+//   minAlone:N       least to order when there is no thali in the order (with a thali the minimum is 1)
+//   maxAlone / maxWithThali  optional, only if the two maximums should differ
 const hasThali = () => ITEMS.some(x => x.group === "thali" && qty[x.id] > 0);
+const thaliMaxOf = i => i.maxWithThali !== undefined ? i.maxWithThali : (i.max || MAX_PER_ITEM);
+const aloneMaxOf = i => {
+  let a = i.maxAlone !== undefined ? i.maxAlone : (i.max || MAX_PER_ITEM);
+  if (i.minAlone !== undefined && a < i.minAlone) a = i.minAlone;   // never lower than the minimum
+  return a;
+};
+const limitLabel = i => {
+  const a = aloneMaxOf(i), t = thaliMaxOf(i);
+  const maxTxt = a === t ? "Max " + a : "Max " + a + " alone, " + t + " with a thali";
+  if (i.minAlone !== undefined) return "Min " + i.minAlone + " alone, 1 with a thali. " + maxTxt;
+  return maxTxt;
+};
 const limitOf = i => {
   if (i.soldOut || ORDERS_CLOSED) return 0;
-  let base = i.max || MAX_PER_ITEM;
-  // Optional: maxAlone = limit when there is no thali in the order, maxWithThali = limit when there is one
-  if (i.maxAlone !== undefined || i.maxWithThali !== undefined) {
-    base = hasThali() ? (i.maxWithThali !== undefined ? i.maxWithThali : base)
-                      : (i.maxAlone !== undefined ? i.maxAlone : (i.minAlone !== undefined ? Math.max(20, i.minAlone) : base));
-  }
+  const base = hasThali() ? thaliMaxOf(i) : aloneMaxOf(i);
   const el = document.getElementById("first");
   return (i.id === FIRST_ORDER_ITEM && el && el.checked) ? base + 1 : base;
 };
+
 const qty = {}; ITEMS.forEach(i => qty[i.id] = 0);
 const $ = id => document.getElementById(id);
 const rupee = n => "₹" + n;
@@ -371,7 +375,9 @@ function calc(){
   const sp = ITEMS.find(i => i.id === FIRST_ORDER_ITEM);
   const useSpecial = $("first").checked && qty[FIRST_ORDER_ITEM] > 0;
   if (useSpecial) food -= (sp.price - FIRST_ORDER_PRICE);
-  const pack = count * PACKAGING_PER_ITEM;
+  // No packing charge on featured dishes
+  const packCount = ITEMS.filter(i => i.group !== "featured").reduce((n,i) => n + qty[i.id], 0);
+  const pack = packCount * PACKAGING_PER_ITEM;
   const thalis = ITEMS.filter(i => i.group === "thali").reduce((n,i) => n + qty[i.id], 0);
   // Items that are not thalis and not marked alone:true can only be ordered together with a real thali
   const needsThali = ITEMS.some(i => qty[i.id] > 0 && i.group !== "thali" && !i.alone);
@@ -386,7 +392,7 @@ function calc(){
     }
   }
   const valid = count > 0 && !problem;
-  return { count, thalis, valid, problem, barHint, food, pack, total: food + pack, useSpecial };
+  return { count, thalis, valid, problem, barHint, packCount, food, pack, total: food + pack, useSpecial };
 }
 
 function render(){
@@ -423,7 +429,7 @@ function fillSheet(){
     ul.appendChild(li);
   });
   $("tFood").textContent = rupee(c.food);
-  $("tPackLabel").textContent = "Packaging (" + c.count + " × ₹" + PACKAGING_PER_ITEM + ")";
+  $("tPackLabel").textContent = c.packCount ? "Packaging (" + c.packCount + " × ₹" + PACKAGING_PER_ITEM + ")" : "Packaging (none)";
   $("tPack").textContent = rupee(c.pack);
   $("tTotal").textContent = rupee(c.total);
   const ok = c.valid;
@@ -529,6 +535,7 @@ if (ORDERS_CLOSED) {
       $("featDishes").appendChild(div);
     });
     $("featDishes").addEventListener("click", onStep);
+    $("featPack").hidden = false;
     $("featured").hidden = false;
     render();
     return;
