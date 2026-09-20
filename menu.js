@@ -16,10 +16,10 @@
 const FIRST_ORDER_OFFER = true;
 const FEATURED = {
   show: true,
-  name: "Featured Dish of the Day",
-  items: ["Fish Batter Fry"],
-  items: ["Kachu Shak Chingri"],
-  itemId: "Featured"
+  dishes: [
+    { id:"fbf",       name:"Fish Batter Fry",    price:89, alone:true  },
+    { id:"kschingri", name:"Kachu Shak Chingri", price:99, alone:false }
+  ]
 };
 const ORDERS_OPEN = true;
 const CLOSED_MESSAGE = "We are closed today. Please check back soon.";
@@ -43,6 +43,4 @@ const ITEMS = [
   { id:"eggc",    group:"curry", name:"Egg Curry (2 pcs)",       price:30, icon:"🥚", },
   { id:"fishc",   group:"curry", name:"Rohu Fish Curry (70 gm)", price:40, icon:"🐟" },
   { id:"chickc",  group:"curry", name:"Chicken Curry (100 gm)",  price:60, icon:"🍗" },
-  { id:"Featured",   group:"curry", name:"Fish Batter Fry", price:89, icon:"⭐", alone:true },
-  { id:"Featured",   group:"curry", name:"Kachu Shak Chingri", price:99, icon:"⭐", alone:false }
 ];
