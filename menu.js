@@ -42,6 +42,7 @@ const ITEMS = [
   { id:"chicken", group:"thali", name:"Chicken Thali",      price:150, icon:"🍗",
     incl:["Bhaat","Dal","Bhaja","Sabji","Chicken (100 gm)"] },
   { id:"eggc",    group:"curry", name:"Egg Curry (2 pcs)",       price:30, icon:"🥚", },
+  { id:"eggoc",    group:"curry", name:"Double Egg Omlette Curry",       price:30, icon:"🥚", },
   { id:"fishc",   group:"curry", name:"Rohu Fish Curry (70 gm)", price:40, icon:"🐟" },
   { id:"chickc",  group:"curry", name:"Chicken Curry (100 gm)",  price:60, icon:"🍗" },
 ];
