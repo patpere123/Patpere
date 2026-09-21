@@ -15,7 +15,7 @@
 /* ---- Number, charges and limits ---- */
 const FIRST_ORDER_OFFER = true;
 const FEATURED = {
-  show: true,
+  show: false,
   dishes: [
     { id:"fbf", name:"Fish Batter Fry", price:89, alone:true, minAlone:4, max:10 },
     { id:"kschingri", name:"Kachu Shak Chingri", price:99, alone:true, minAlone:2, max:6 },
