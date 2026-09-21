@@ -17,7 +17,7 @@ const FIRST_ORDER_OFFER = true;
 const FEATURED = {
   show: true,
   dishes: [
-    { id:"fbf", name:"Fish Batter Fry", price:89, alone:true, minAlone:4, max:10, SoldOut:true },
+    { id:"fbf", name:"Fish Batter Fry", price:89, alone:true, minAlone:4, max:10, soldOut:true },
   ]
 };
 const ORDERS_OPEN = true;
