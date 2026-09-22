@@ -37,7 +37,7 @@ const ITEMS = [
     incl:["Bhaat","Dal","Sabji Bharta / Shukto / Shaak / Chacchori","Bhaja","Sabji","Chatni / Salad"] },
   { id:"egg",     group:"thali", name:"Dim (Egg) Thali",    price:120, icon:"🥚",
     incl:["Rice","Dal","Bhaja","Sabji","Egg (1 pc)"] },
-  { id:"fish",    group:"thali", name:"Maach (Fish) Thali", price:140, icon:"🐟",
+  { id:"fish",    group:"thali", name:"Maach (Fish) Thali", price:1, icon:"🐟",
     incl:["Bhaat","Dal","Bhaja","Sabji","Rui Maach (70 gm)"] },
   { id:"chicken", group:"thali", name:"Chicken Thali",      price:150, icon:"🍗",
     incl:["Bhaat","Dal","Bhaja","Sabji","Chicken (100 gm)"] },
