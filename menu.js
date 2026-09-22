@@ -17,7 +17,6 @@ const FIRST_ORDER_OFFER = true;
 const FEATURED = {
   show: true,
   dishes: [
-    { id:"fbf", name:"Fish Batter Fry", price:89, alone:true, minAlone:4, max:10, show:false },
     { id:"rblps", name:"Bhaat, Biulir Dal, Posto", price:89, alone:true, minAlone:2, max:6 },
   ]
 };
