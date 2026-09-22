@@ -1,4 +1,4 @@
-a1/* =========================================================
+a/* =========================================================
    পাতপেড়ে · MENU FILE. This is the only file you need to edit.
 
    Change a price ........ edit the number after price:
@@ -18,7 +18,7 @@ const FEATURED = {
   show: true,
   dishes: [
     { id:"fbf", name:"Fish Batter Fry", price:89, alone:true, minAlone:4, max:10, soldOut:true },
-    { id:"rblps", name:"Bhaat, Biulir Dal, Posto", price:89, alone:true, minAlone:2, max:6, },
+    { id:"rblps", name:"Bhaat, Biulir Dal, Posto", price:89, alone:true, minAlone:2, max:6 },
   ]
 };
 const ORDERS_OPEN = true;
