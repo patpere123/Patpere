@@ -1,4 +1,4 @@
-1/* =========================================================
+a1/* =========================================================
    পাতপেড়ে · MENU FILE. This is the only file you need to edit.
 
    Change a price ........ edit the number after price:
@@ -18,6 +18,7 @@ const FEATURED = {
   show: true,
   dishes: [
     { id:"fbf", name:"Fish Batter Fry", price:89, alone:true, minAlone:4, max:10, soldOut:true },
+    { id:"rblps", name:"Bhaat, Biulir Dal, Posto", price:89, alone:true, minAlone:2, max:6, },
   ]
 };
 const ORDERS_OPEN = true;
@@ -45,4 +46,5 @@ const ITEMS = [
   { id:"eggoc",    group:"curry", name:"Double Egg Omlette Curry",       price:35, icon:"🥚", },
   { id:"fishc",   group:"curry", name:"Rohu Fish Curry (70 gm)", price:40, icon:"🐟" },
   { id:"chickc",  group:"curry", name:"Chicken Curry (100 gm)",  price:60, icon:"🍗" },
+  { id:"pnrkr",  group:"curry", name:"Kadai Paneer (100 gm)",  price:60, icon:"🧈w" },
 ];
