@@ -17,7 +17,7 @@ const FIRST_ORDER_OFFER = true;
 const FEATURED = {
   show: true,
   dishes: [
-    { id:"fbf", name:"Fish Batter Fry", price:89, alone:true, minAlone:4, max:10, soldOut:true },
+    { id:"fbf", name:"Fish Batter Fry", price:89, alone:true, minAlone:4, max:10, show:false },
     { id:"rblps", name:"Bhaat, Biulir Dal, Posto", price:89, alone:true, minAlone:2, max:6 },
   ]
 };
@@ -48,10 +48,10 @@ const ITEMS = [
   { id:"chickc",  group:"curry", name:"Chicken Curry (100 gm)",  price:60, icon:"🍗" },
   { id:"pnrkr",  group:"curry", name:"Kadai Paneer (100 gm)",  price:60, icon:"🧈" },
   { id:"combo270", group:"combo", alone:true, minAlways:2, max:6, name:"Mutton Kasha Combo", price:270, icon:"🍛",
-    choices:[ { id:"rice", label:"Rice", options:["Basanti Polao","Veg Fried Rice"] } ] },
-  { id:"combo150", group:"combo", alone:true, minAlways:2, max:6, name:"Kasha & Chilli Combo", price:150, icon:"🍛",
+    choices:[ { id:"rice", label:"Choose Rice", options:["Basanti Polao","Veg Fried Rice"] } ] },
+  { id:"combo150", group:"combo", alone:true, minAlways:2, max:6, name:"Chicken or Veg Combo", price:150, icon:"🍛",
     choices:[
-      { id:"rice", label:"Rice",   options:["Basanti Polao","Veg Fried Rice"] },
-      { id:"item", label:"Choose", options:["Chicken Kasha","Chilli Chicken","Chilli Paneer","Chilli Soya"] }
+      { id:"rice", label:"Choose Rice",   options:["Basanti Polao","Veg Fried Rice"] },
+      { id:"item", label:"Choose Gravy", options:["Chicken Kasha","Chilli Chicken","Chilli Paneer","Chilli Soya"] }
     ] },
 ];
