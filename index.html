@@ -355,7 +355,7 @@ const rupee = n => "₹" + n;
 const rows = $("rows");
 const rowEls = {}, fdEls = {}, outState = {};
 const isOut = i => i.soldOut || ORDERS_CLOSED || (stockLeft[i.id] !== undefined && stockLeft[i.id] <= 0);
-const outText = i => (i.soldOut || (stockLeft[i.id] !== undefined && stockLeft[i.id] <= 0)) ? "Sold out today" : "Closed";
+const outText = i => (i.soldOut || (stockLeft[i.id] !== undefined && stockLeft[i.id] <= 0)) ? "Sold out" : "Closed";
 const stepperHTML = i =>
   '<div class="stepper">' +
     '<button type="button" aria-label="Remove one ' + i.name + '" data-id="' + i.id + '" data-d="-1">−</button>' +
