@@ -79,6 +79,7 @@ h2 small{font-family:var(--body);font-weight:500;font-size:16px;color:var(--mute
 .incl{grid-column:1/-1;margin:0 4px 2px}
 .incl summary{cursor:pointer;font:600 15.5px var(--body);min-height:40px;display:flex;align-items:center;gap:6px;text-decoration:underline;text-underline-offset:3px}
 .incl ul{margin:2px 0 6px;padding-left:22px;font-size:16px;line-height:1.55}
+.row-note{grid-column:1/-1;margin:4px 2px 0;font-size:14px;line-height:1.4;opacity:.92;text-align:center}
 .row .sm2{display:block;font-size:14px;opacity:.85;font-weight:500}
 .ico{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;font-size:24px}
 .row h3{margin:0;font:700 20px/1.1 var(--display)}
@@ -228,6 +229,10 @@ h2 small{display:block;margin:2px 0 0}
     <p class="sub">Egg, fish or chicken curry. Add these to an order that includes at least one thali.</p>
     <ul class="rows" id="rows2"></ul>
 
+    <h2 id="combo-h" style="margin-top:30px">Combo Meals</h2>
+    <p class="sub">No packaging charge. Order on their own, no thali needed.</p>
+    <ul class="rows" id="rows3"></ul>
+
     <div class="alacarte">
       <h3>Bulk Orders</h3>
       <p>Party, office lunch or an event?<br> WhatsApp or call us for bulk orders.</p>
@@ -326,14 +331,21 @@ const ORDERS_CLOSED = (typeof ORDERS_OPEN !== "undefined" && ORDERS_OPEN === fal
 //   minAlone:N       least to order when there is no thali in the order (with a thali the minimum is 1)
 //   maxAlone / maxWithThali  optional, only if the two maximums should differ
 const hasThali = () => ITEMS.some(x => x.group === "thali" && qty[x.id] > 0);
-const thaliMaxOf = i => i.maxWithThali !== undefined ? i.maxWithThali : (i.max || MAX_PER_ITEM);
+const thaliMaxOf = i => {
+  let t = i.maxWithThali !== undefined ? i.maxWithThali : (i.max || MAX_PER_ITEM);
+  if (i.minAlways !== undefined && t < i.minAlways) t = i.minAlways;
+  return t;
+};
 const aloneMaxOf = i => {
   let a = i.maxAlone !== undefined ? i.maxAlone : (i.max || MAX_PER_ITEM);
   if (i.minAlone !== undefined && a < i.minAlone) a = i.minAlone;   // never lower than the minimum
+  if (i.minAlways !== undefined && a < i.minAlways) a = i.minAlways;
   return a;
 };
 const limitLabel = i => {
   const a = aloneMaxOf(i), t = thaliMaxOf(i);
+  // minAlways: this minimum and maximum hold whether or not the order has a thali
+  if (i.minAlways !== undefined) return "Min " + i.minAlways + ", max " + Math.max(a, t) + " per order";
   const maxTxt = a === t ? "Max " + a : "Max " + a + " alone, " + t + " with a thali";
   if (i.minAlone !== undefined) return "Min " + i.minAlone + " alone, 1 with a thali. " + maxTxt;
   return maxTxt;
@@ -362,7 +374,7 @@ const stepperHTML = i =>
     '<span class="qty" id="q-' + i.id + '" aria-live="polite">0</span>' +
     '<button type="button" aria-label="Add one ' + i.name + '" data-id="' + i.id + '" data-d="1">+</button>' +
   '</div>';
-const rowClass = i => "row " + (i.group === "curry" ? "curry" : i.id) + (isOut(i) ? " sold" : "");
+const rowClass = i => "row " + (i.group === "curry" || i.group === "combo" ? "curry" : i.id) + (isOut(i) ? " sold" : "");
 const rowHTML = i => {
   const off = isOut(i);
   return '<h3>' + i.name + '</h3>' +
@@ -370,7 +382,8 @@ const rowHTML = i => {
     '<div class="mid"><span class="price">' + rupee(i.price) + '</span>' +
       (off ? '' : '<span class="sm2" id="max-' + i.id + '">Max ' + limitOf(i) + ' per order</span>') + '</div>' +
     (off ? '<span class="soldtag">' + outText(i) + '</span>' : stepperHTML(i)) +
-    (i.incl ? '<details class="incl"><summary>What\'s on the plate</summary><ul>' + i.incl.map(x => '<li>' + x + '</li>').join('') + '</ul></details>' : '');
+    (i.incl ? '<details class="incl"><summary>What\'s on the plate</summary><ul>' + i.incl.map(x => '<li>' + x + '</li>').join('') + '</ul></details>' : '') +
+    (i.note ? '<p class="row-note">' + i.note + '</p>' : '');
 };
 const fdHTML = i => {
   const off = isOut(i);
@@ -385,22 +398,25 @@ ITEMS.forEach(i => {
   li.className = rowClass(i);
   li.innerHTML = rowHTML(i);
   rowEls[i.id] = li;
-  (i.group === "curry" ? $("rows2") : rows).appendChild(li);
+  const target = i.group === "curry" ? $("rows2") : (i.group === "combo" ? $("rows3") : rows);
+  target.appendChild(li);
 });
 const onStep = e => {
   const b = e.target.closest("button[data-id]"); if (!b) return;
   const id = b.dataset.id;
   const item = ITEMS.find(x => x.id === id);
   let next = qty[id] + Number(b.dataset.d);
-  if (item.minAlone && !hasThali()) {
-    if (b.dataset.d === "1" && qty[id] === 0) next = item.minAlone;
-    if (b.dataset.d === "-1" && qty[id] <= item.minAlone) next = 0;
+  const minReq = item.minAlways !== undefined ? item.minAlways : ((item.minAlone !== undefined && !hasThali()) ? item.minAlone : undefined);
+  if (minReq) {
+    if (b.dataset.d === "1" && qty[id] === 0) next = minReq;
+    if (b.dataset.d === "-1" && qty[id] <= minReq) next = 0;
   }
   qty[id] = Math.max(0, Math.min(limitOf(item), next));
   render();
 };
 rows.addEventListener("click", onStep);
 $("rows2").addEventListener("click", onStep);
+$("rows3").addEventListener("click", onStep);
 $("first").addEventListener("change", () => {
   ITEMS.forEach(i => { if (qty[i.id] > limitOf(i)) qty[i.id] = limitOf(i); });
   render();
@@ -413,19 +429,25 @@ function calc(){
   const useSpecial = $("first").checked && qty[FIRST_ORDER_ITEM] > 0;
   if (useSpecial) food -= (sp.price - FIRST_ORDER_PRICE);
   // No packing charge on featured dishes
-  const packCount = ITEMS.filter(i => i.group !== "featured").reduce((n,i) => n + qty[i.id], 0);
+  const packCount = ITEMS.filter(i => i.group !== "featured" && i.group !== "combo").reduce((n,i) => n + qty[i.id], 0);
   const pack = packCount * PACKAGING_PER_ITEM;
   const thalis = ITEMS.filter(i => i.group === "thali").reduce((n,i) => n + qty[i.id], 0);
   // Items that are not thalis and not marked alone:true can only be ordered together with a real thali
   const needsThali = ITEMS.some(i => qty[i.id] > 0 && i.group !== "thali" && !i.alone);
   let problem = "", barHint = "";
-  if (count > 0 && thalis === 0) {
-    if (needsThali) {
+  if (count > 0) {
+    if (needsThali && thalis === 0) {
       problem = "Some items in your cart can only be ordered with a thali. Add at least one thali to send your order."; barHint = "Add a thali to order";
     } else {
-      // minAlone: the least a customer must order of a dish when there is no thali in the order
-      const short = ITEMS.find(i => i.minAlone && qty[i.id] > 0 && qty[i.id] < i.minAlone);
-      if (short) { problem = short.name + ": please order at least " + short.minAlone + " when ordering on its own, or add a thali."; barHint = "Add more or a thali"; }
+      // minAlways: least to order of this dish, whether or not there is a thali in the order
+      const shortAlways = ITEMS.find(i => i.minAlways !== undefined && qty[i.id] > 0 && qty[i.id] < i.minAlways);
+      // minAlone: least to order only when there is no thali in the order
+      const shortAlone = (thalis === 0) ? ITEMS.find(i => i.minAlone !== undefined && qty[i.id] > 0 && qty[i.id] < i.minAlone) : null;
+      const short = shortAlways || shortAlone;
+      if (short) {
+        if (short.minAlways !== undefined) { problem = short.name + ": please order at least " + short.minAlways + " per order."; barHint = "Add more " + short.name; }
+        else { problem = short.name + ": please order at least " + short.minAlone + " when ordering on its own, or add a thali."; barHint = "Add more or a thali"; }
+      }
     }
   }
   const valid = count > 0 && !problem;
@@ -440,7 +462,7 @@ function render(){
     const plus = document.querySelector('button[data-id="' + i.id + '"][data-d="1"]');
     if (plus) plus.disabled = qty[i.id] >= limitOf(i);
     const m = $("max-" + i.id);
-    if (m) m.textContent = (i.maxAlone !== undefined || i.maxWithThali !== undefined || i.minAlone !== undefined)
+    if (m) m.textContent = (i.maxAlone !== undefined || i.maxWithThali !== undefined || i.minAlone !== undefined || i.minAlways !== undefined)
       ? limitLabel(i)
       : (i.id === FIRST_ORDER_ITEM && $("first").checked)
       ? "Max " + (limitOf(i) - 1) + " + your ₹" + FIRST_ORDER_PRICE + " first-order meal"
