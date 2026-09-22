@@ -47,4 +47,8 @@ const ITEMS = [
   { id:"fishc",   group:"curry", name:"Katla Fish Curry (70 gm)", price:50, icon:"🐟" },
   { id:"chickc",  group:"curry", name:"Chicken Curry (100 gm)",  price:60, icon:"🍗" },
   { id:"pnrkr",  group:"curry", name:"Kadai Paneer (100 gm)",  price:60, icon:"🧈" },
+  { id:"combo270", group:"combo", alone:true, minAlways:2, max:6, name:"Mutton Kasha Combo", price:270, icon:"🍛",
+    note:"Basanti Polao or Veg Fried Rice + Mutton Kasha" },
+  { id:"combo150", group:"combo", alone:true, minAlways:2, max:6, name:"Kasha & Chilli Combo", price:150, icon:"🍛",
+    note:"Basanti Polao or Veg Fried Rice + Chicken Kasha, Chilli Chicken, Chilli Paneer or Chilli Soya. Please mention your choice in the notes when ordering." },
 ];
