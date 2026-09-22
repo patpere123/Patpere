@@ -44,7 +44,7 @@ const ITEMS = [
     incl:["Bhaat","Dal","Bhaja","Sabji","Chicken (100 gm)"] },
   { id:"eggc",    group:"curry", name:"Egg Curry (2 pcs)",       price:30, icon:"🥚", },
   { id:"eggoc",    group:"curry", name:"Double Egg Omlette Curry",       price:35, icon:"🥚", },
-  { id:"fishc",   group:"curry", name:"Rohu Fish Curry (70 gm)", price:40, icon:"🐟" },
+  { id:"fishc",   group:"curry", name:"Katla Fish Curry (70 gm)", price:50, icon:"🐟" },
   { id:"chickc",  group:"curry", name:"Chicken Curry (100 gm)",  price:60, icon:"🍗" },
   { id:"pnrkr",  group:"curry", name:"Kadai Paneer (100 gm)",  price:60, icon:"🧈" },
 ];
