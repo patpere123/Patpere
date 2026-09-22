@@ -46,5 +46,5 @@ const ITEMS = [
   { id:"eggoc",    group:"curry", name:"Double Egg Omlette Curry",       price:35, icon:"🥚", },
   { id:"fishc",   group:"curry", name:"Rohu Fish Curry (70 gm)", price:40, icon:"🐟" },
   { id:"chickc",  group:"curry", name:"Chicken Curry (100 gm)",  price:60, icon:"🍗" },
-  { id:"pnrkr",  group:"curry", name:"Kadai Paneer (100 gm)",  price:60, icon:"🧈w" },
+  { id:"pnrkr",  group:"curry", name:"Kadai Paneer (100 gm)",  price:60, icon:"🧈" },
 ];
