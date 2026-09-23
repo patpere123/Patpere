@@ -3,30 +3,34 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7f3ea">
 <title>Patpere · Home-cooked twhalis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+Da+2:wght@600;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#fbf6e6; --card:#fffdf6; --ink:#1d2a1f; --muted:#5b6a5d; --line:#e4dcc3;
-  --leaf:#1f6b34; --leaf-deep:#134420; --turmeric:#f2b632; --turmeric-soft:#fdeeb9;
-  --chilli:#c0242b; --river:#1d6fa8; --on-leaf:#ffffff;
-  --brand:#1d5a2c; --tagline:#8a2a1e; --gold:#c9a24b; --glow:rgba(255,255,255,.6);
+  /* Elegant palette: ivory paper, deep emerald, antique gold, burgundy */
+  --paper:#f7f3ea; --card:#fffdf8; --ink:#1e2320; --muted:#666a60; --line:#e3dac6;
+  --leaf:#1e4d3b; --leaf-deep:#12332a; --turmeric:#b8923f; --turmeric-soft:#f4ecd6;
+  --chilli:#7a2a35; --river:#2f4f6b; --on-leaf:#ffffff;
+  --brand:#1e4d3b; --tagline:#7a2a35; --gold:#b8923f; --glow:rgba(255,255,255,.7);
   --display:"Baloo Da 2","Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif;
   --body:"Hind Siliguri","Noto Sans Bengali",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --paper:#111a13; --card:#182319; --ink:#f3efe0; --muted:#a8b5a9; --line:#2b3a2d;
-    --leaf:#2f8a48; --leaf-deep:#0d2a15; --turmeric-soft:#3a3016;
-    --brand:#7fd08f; --tagline:#f0a99b; --gold:#8a7434; --glow:rgba(255,255,255,.04);
+    --paper:#0f1614; --card:#16211d; --ink:#f2ede0; --muted:#a9b3ab; --line:#2a3a34;
+    --leaf:#2f7a5f; --leaf-deep:#0a1f19; --turmeric:#c9a24b; --turmeric-soft:#2e2818;
+    --chilli:#c4566a; --river:#3e6285;
+    --brand:#8fd0b0; --tagline:#e0a8b0; --gold:#9a8240; --glow:rgba(255,255,255,.04);
   }
 }
 :root[data-theme="dark"]{
-  --paper:#111a13; --card:#182319; --ink:#f3efe0; --muted:#a8b5a9; --line:#2b3a2d;
-  --leaf:#2f8a48; --leaf-deep:#0d2a15; --turmeric-soft:#3a3016;
-  --brand:#7fd08f; --tagline:#f0a99b; --gold:#8a7434; --glow:rgba(255,255,255,.04);
+  --paper:#0f1614; --card:#16211d; --ink:#f2ede0; --muted:#a9b3ab; --line:#2a3a34;
+  --leaf:#2f7a5f; --leaf-deep:#0a1f19; --turmeric:#c9a24b; --turmeric-soft:#2e2818;
+  --chilli:#c4566a; --river:#3e6285;
+  --brand:#8fd0b0; --tagline:#e0a8b0; --gold:#9a8240; --glow:rgba(255,255,255,.04);
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -53,12 +57,12 @@ a{color:inherit}
 .shut b{font-family:var(--display);font-size:19px;color:var(--chilli);display:block}
 .stepper button:disabled{opacity:.35;cursor:not-allowed}
 .photo{margin:20px 0 0;position:relative}
-.photo img{width:100%;aspect-ratio:1/0.82;object-fit:cover;border-radius:0 46% 0 46%;border:4px solid var(--card);box-shadow:0 10px 30px rgba(20,68,32,.22)}
+.photo img{width:100%;aspect-ratio:1/0.82;object-fit:cover;border-radius:0 46% 0 46%;border:4px solid var(--card);box-shadow:0 10px 30px rgba(18,51,42,.22)}
 .actions{display:flex;gap:10px;margin:22px 0 6px;flex-wrap:wrap}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 22px;border-radius:999px;border:0;font:600 17px var(--body);text-decoration:none;cursor:pointer}
 .btn-primary{background:var(--leaf);color:#fff}
 .btn-ghost{background:transparent;color:var(--ink);border:2px solid var(--leaf)}
-.btn-wa{background:#1fa855;color:#fff;width:100%}
+.btn-wa{background:#2b7a57;color:#fff;width:100%}
 .btn[disabled]{opacity:.5;cursor:not-allowed}
 
 /* Menu */
@@ -68,7 +72,7 @@ h2 small{font-family:var(--body);font-weight:500;font-size:16px;color:var(--mute
 .sub{color:var(--muted);margin:0 0 14px}
 .rows{display:grid;gap:12px;padding:0;margin:0;list-style:none}
 .row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:12px 14px;border-radius:40px 26px 26px 40px;color:#fff;background:var(--leaf)}
-.row.veg{background:var(--leaf)} .row.egg{background:var(--turmeric);color:#22190a}
+.row.veg{background:var(--leaf)} .row.egg{background:var(--turmeric);color:#1f1808}
 .row.fish{background:var(--river)} .row.chicken{background:var(--chilli)}
 .row.spveg{background:var(--leaf-deep);box-shadow:inset 0 0 0 3px var(--turmeric)}
 .row.curry{background:var(--card);color:var(--ink);border:2px solid var(--line)}
@@ -81,14 +85,14 @@ h2 small{font-family:var(--body);font-weight:500;font-size:16px;color:var(--mute
 .incl ul{margin:2px 0 6px;padding-left:22px;font-size:16px;line-height:1.55}
 .row-note{grid-column:1/-1;margin:4px 2px 0;font-size:14px;line-height:1.4;opacity:.92;text-align:center}
 .choices{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:6px 2px 0}
-.choice-f select{min-height:44px;padding:0 12px;border-radius:12px;border:2px solid var(--line);font:600 15px var(--body);background:#fffdf6;color:#1d2a1f;min-width:150px}
+.choice-f select{min-height:44px;padding:0 12px;border-radius:12px;border:2px solid var(--line);font:600 15px var(--body);background:#fffdf8;color:#1e2320;min-width:150px}
 .choice-f select:invalid{color:var(--muted);border-color:var(--turmeric)}
 .row .sm2{display:block;font-size:14px;opacity:.85;font-weight:500}
 .ico{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;font-size:24px}
 .row h3{margin:0;font:700 20px/1.1 var(--display)}
 .price{font:700 22px var(--display)}
 .stepper{display:flex;align-items:center;gap:8px}
-.stepper button{width:44px;height:44px;border-radius:50%;border:0;background:#fffdf6;color:#1d2a1f;font:700 24px/1 var(--body);cursor:pointer;display:grid;place-items:center}
+.stepper button{width:44px;height:44px;border-radius:50%;border:0;background:#fffdf8;color:#1e2320;font:700 24px/1 var(--body);cursor:pointer;display:grid;place-items:center}
 .stepper button:active{transform:scale(.94)}
 .qty{min-width:22px;text-align:center;font:700 20px var(--display)}
 
@@ -116,7 +120,7 @@ footer a{color:var(--turmeric);font-weight:700;font-size:20px;text-decoration:no
 .bar.on{transform:none}
 .bar button{width:100%;min-height:56px;border:0;border-radius:16px;background:var(--leaf);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font:700 18px var(--body);cursor:pointer}
 dialog{border:0;padding:0;width:100%;max-width:620px;margin:auto auto 0;border-radius:26px 26px 0 0;background:var(--paper);color:var(--ink);max-height:92vh}
-dialog::backdrop{background:rgba(10,20,12,.55)}
+dialog::backdrop{background:rgba(8,16,13,.6)}
 .sheet{padding:20px 18px calc(22px + env(safe-area-inset-bottom))}
 .sheet-head{display:flex;justify-content:space-between;align-items:center}
 .sheet h2{margin:0}
@@ -135,7 +139,7 @@ textarea{min-height:84px;resize:vertical}
 .closedbox{margin:12px 0 0;background:var(--chilli);color:#fff;border-radius:14px;padding:14px 16px}
 .closedbox b{display:block;font:800 22px var(--display)}
 .closedbox span{display:block;margin-top:2px;font-size:17px;white-space:pre-line}
-.feat{margin:22px 0 0;padding:18px 16px 16px;border-radius:24px;background:linear-gradient(160deg,var(--turmeric-soft),var(--card));border:2px solid var(--turmeric);box-shadow:0 8px 22px rgba(20,68,32,.14)}
+.feat{margin:22px 0 0;padding:18px 16px 16px;border-radius:24px;background:linear-gradient(160deg,var(--turmeric-soft),var(--card));border:2px solid var(--turmeric);box-shadow:0 8px 22px rgba(18,51,42,.14)}
 .feat-badge{display:inline-block;background:var(--chilli);color:#fff;border-radius:999px;padding:5px 16px 3px;font:800 16px/1.3 var(--display)}
 .feat h2{margin:10px 0 2px;font-size:28px;line-height:1.15}
 .feat-items{margin:2px 0 0;color:var(--muted);font-size:17px}
@@ -182,7 +186,7 @@ h2 small{display:block;margin:2px 0 0}
   <div class="wrap">
     <div class="logo">
       <div class="word">
-        <svg class="leaf" viewBox="0 0 190 80" aria-hidden="true" focusable="false"><defs><linearGradient id="lg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#1b5a2a"/><stop offset="1" stop-color="#3f9a44"/></linearGradient></defs><g transform="translate(10 64) rotate(-20)"><path d="M0.0 -0.0 L3.4 -7.4 L6.9 -11.3 L10.3 -14.3 L13.8 -16.9 L17.2 -19.1 L20.6 -21.1 L24.1 -22.8 L27.5 -24.4 L30.9 -25.7 L34.4 -26.9 L37.8 -28.0 L41.2 -28.9 L44.7 -29.6 L48.1 -30.3 L51.6 -30.8 L55.0 -31.2 L58.4 -31.5 L61.9 -31.6 L65.3 -31.7 L68.8 -31.6 L72.2 -31.5 L75.6 -31.2 L79.1 -30.9 L82.5 -30.5 L85.9 -30.0 L89.4 -29.4 L92.8 -28.7 L96.2 -28.0 L99.7 -27.2 L103.1 -26.3 L106.6 -25.3 L110.0 -24.3 L113.4 -23.2 L116.9 -22.0 L120.3 -20.8 L123.8 -19.6 L127.2 -18.3 L130.6 -16.9 L134.1 -15.5 L137.5 -14.0 L140.9 -12.5 L144.4 -11.0 L147.8 -9.4 L151.2 -7.7 L154.7 -6.0 L158.1 -4.2 L161.6 -2.3 L165.0 -0.0 L165.0 0.0 L161.6 1.6 L158.1 2.9 L154.7 4.0 L151.2 5.1 L147.8 6.2 L144.4 7.1 L140.9 8.1 L137.5 9.0 L134.1 9.9 L130.6 10.8 L127.2 11.7 L123.8 12.5 L120.3 13.3 L116.9 14.1 L113.4 14.9 L110.0 15.6 L106.6 16.3 L103.1 17.0 L99.7 17.7 L96.2 18.3 L92.8 18.9 L89.4 19.5 L85.9 20.0 L82.5 20.5 L79.1 20.9 L75.6 21.3 L72.2 21.7 L68.8 22.0 L65.3 22.2 L61.9 22.4 L58.4 22.5 L55.0 22.5 L51.6 22.5 L48.1 22.3 L44.7 22.1 L41.2 21.8 L37.8 21.4 L34.4 20.9 L30.9 20.2 L27.5 19.4 L24.1 18.4 L20.6 17.3 L17.2 15.9 L13.8 14.3 L10.3 12.4 L6.9 10.0 L3.4 6.8 L0.0 0.0Z" fill="url(#lg)"/><path d="M11.6 -1.1 L33.0 -24.8 M11.6 -1.1 L33.0 19.0 M23.4 -2.2 L44.9 -27.9 M23.4 -2.2 L44.9 20.3 M35.3 -3.1 L56.8 -29.4 M35.3 -3.1 L56.8 20.6 M47.2 -3.9 L68.6 -29.8 M47.2 -3.9 L68.6 20.1 M59.1 -4.5 L80.5 -28.9 M59.1 -4.5 L80.5 19.0 M71.0 -4.9 L92.4 -27.1 M71.0 -4.9 L92.4 17.3 M82.8 -5.0 L104.3 -24.5 M82.8 -5.0 L104.3 15.3 M94.7 -4.9 L116.2 -21.0 M94.7 -4.9 L116.2 13.0 M106.6 -4.5 L128.0 -16.9 M106.6 -4.5 L128.0 10.4 M118.5 -3.9 L139.9 -12.2 M118.5 -3.9 L139.9 7.6 M130.3 -3.1 L151.8 -7.0 M130.3 -3.1 L151.8 4.5 M142.2 -2.1 L163.7 -0.9 M142.2 -2.1 L163.7 0.7" stroke="#b7e08a" stroke-opacity=".55" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M0 0 L6.9 -0.7 L13.8 -1.3 L20.6 -1.9 L27.5 -2.5 L34.4 -3.0 L41.2 -3.5 L48.1 -4.0 L55.0 -4.3 L61.9 -4.6 L68.8 -4.8 L75.6 -5.0 L82.5 -5.0 L89.4 -5.0 L96.2 -4.8 L103.1 -4.6 L110.0 -4.3 L116.9 -4.0 L123.8 -3.5 L130.6 -3.0 L137.5 -2.5 L144.4 -1.9 L151.2 -1.3 L158.1 -0.7 L165.0 -0.0" stroke="#0f3d1a" stroke-width="2.4" stroke-linecap="round" fill="none"/></g></svg>
+        <svg class="leaf" viewBox="0 0 190 80" aria-hidden="true" focusable="false"><defs><linearGradient id="lg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#1e4d3b"/><stop offset="1" stop-color="#4f8f73"/></linearGradient></defs><g transform="translate(10 64) rotate(-20)"><path d="M0.0 -0.0 L3.4 -7.4 L6.9 -11.3 L10.3 -14.3 L13.8 -16.9 L17.2 -19.1 L20.6 -21.1 L24.1 -22.8 L27.5 -24.4 L30.9 -25.7 L34.4 -26.9 L37.8 -28.0 L41.2 -28.9 L44.7 -29.6 L48.1 -30.3 L51.6 -30.8 L55.0 -31.2 L58.4 -31.5 L61.9 -31.6 L65.3 -31.7 L68.8 -31.6 L72.2 -31.5 L75.6 -31.2 L79.1 -30.9 L82.5 -30.5 L85.9 -30.0 L89.4 -29.4 L92.8 -28.7 L96.2 -28.0 L99.7 -27.2 L103.1 -26.3 L106.6 -25.3 L110.0 -24.3 L113.4 -23.2 L116.9 -22.0 L120.3 -20.8 L123.8 -19.6 L127.2 -18.3 L130.6 -16.9 L134.1 -15.5 L137.5 -14.0 L140.9 -12.5 L144.4 -11.0 L147.8 -9.4 L151.2 -7.7 L154.7 -6.0 L158.1 -4.2 L161.6 -2.3 L165.0 -0.0 L165.0 0.0 L161.6 1.6 L158.1 2.9 L154.7 4.0 L151.2 5.1 L147.8 6.2 L144.4 7.1 L140.9 8.1 L137.5 9.0 L134.1 9.9 L130.6 10.8 L127.2 11.7 L123.8 12.5 L120.3 13.3 L116.9 14.1 L113.4 14.9 L110.0 15.6 L106.6 16.3 L103.1 17.0 L99.7 17.7 L96.2 18.3 L92.8 18.9 L89.4 19.5 L85.9 20.0 L82.5 20.5 L79.1 20.9 L75.6 21.3 L72.2 21.7 L68.8 22.0 L65.3 22.2 L61.9 22.4 L58.4 22.5 L55.0 22.5 L51.6 22.5 L48.1 22.3 L44.7 22.1 L41.2 21.8 L37.8 21.4 L34.4 20.9 L30.9 20.2 L27.5 19.4 L24.1 18.4 L20.6 17.3 L17.2 15.9 L13.8 14.3 L10.3 12.4 L6.9 10.0 L3.4 6.8 L0.0 0.0Z" fill="url(#lg)"/><path d="M11.6 -1.1 L33.0 -24.8 M11.6 -1.1 L33.0 19.0 M23.4 -2.2 L44.9 -27.9 M23.4 -2.2 L44.9 20.3 M35.3 -3.1 L56.8 -29.4 M35.3 -3.1 L56.8 20.6 M47.2 -3.9 L68.6 -29.8 M47.2 -3.9 L68.6 20.1 M59.1 -4.5 L80.5 -28.9 M59.1 -4.5 L80.5 19.0 M71.0 -4.9 L92.4 -27.1 M71.0 -4.9 L92.4 17.3 M82.8 -5.0 L104.3 -24.5 M82.8 -5.0 L104.3 15.3 M94.7 -4.9 L116.2 -21.0 M94.7 -4.9 L116.2 13.0 M106.6 -4.5 L128.0 -16.9 M106.6 -4.5 L128.0 10.4 M118.5 -3.9 L139.9 -12.2 M118.5 -3.9 L139.9 7.6 M130.3 -3.1 L151.8 -7.0 M130.3 -3.1 L151.8 4.5 M142.2 -2.1 L163.7 -0.9 M142.2 -2.1 L163.7 0.7" stroke="#e3d3a3" stroke-opacity=".55" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M0 0 L6.9 -0.7 L13.8 -1.3 L20.6 -1.9 L27.5 -2.5 L34.4 -3.0 L41.2 -3.5 L48.1 -4.0 L55.0 -4.3 L61.9 -4.6 L68.8 -4.8 L75.6 -5.0 L82.5 -5.0 L89.4 -5.0 L96.2 -4.8 L103.1 -4.6 L110.0 -4.3 L116.9 -4.0 L123.8 -3.5 L130.6 -3.0 L137.5 -2.5 L144.4 -1.9 L151.2 -1.3 L158.1 -0.7 L165.0 -0.0" stroke="#12332a" stroke-width="2.4" stroke-linecap="round" fill="none"/></g></svg>
         <h1 class="brand" lang="bn">পাতপেড়ে</h1>
         <svg class="spark" viewBox="0 0 50 72" aria-hidden="true" focusable="false"><g stroke="currentColor" stroke-width="5.5" stroke-linecap="round" fill="none"><path d="M6 32 L15 6"/><path d="M22 44 L44 30"/><path d="M24 66 L44 60"/></g></svg>
       </div>
