@@ -81,8 +81,8 @@ h2 small{font-family:var(--body);font-weight:500;font-size:16px;color:var(--mute
 .incl ul{margin:2px 0 6px;padding-left:22px;font-size:16px;line-height:1.55}
 .row-note{grid-column:1/-1;margin:4px 2px 0;font-size:14px;line-height:1.4;opacity:.92;text-align:center}
 .choices{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:6px 2px 0}
-.choice-f{display:flex;flex-direction:column;gap:2px;font-size:13px;font-weight:600;opacity:.95}
-.choice-f select{min-height:40px;padding:0 8px;border-radius:10px;border:0;font:600 14px var(--body);background:#fffdf6;color:#1d2a1f}
+.choice-f select{min-height:44px;padding:0 12px;border-radius:12px;border:2px solid var(--line);font:600 15px var(--body);background:#fffdf6;color:#1d2a1f;min-width:150px}
+.choice-f select:invalid{color:var(--muted);border-color:var(--turmeric)}
 .row .sm2{display:block;font-size:14px;opacity:.85;font-weight:500}
 .ico{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;font-size:24px}
 .row h3{margin:0;font:700 20px/1.1 var(--display)}
@@ -368,29 +368,26 @@ const rupee = n => "₹" + n;
 
 // Dropdown choices on a dish (set "choices" on the dish in menu.js). One choice per dish per order line.
 const choiceSel = {};
-const choiceValue = (i, key) => {
-  if (!choiceSel[i.id]) choiceSel[i.id] = {};
-  if (choiceSel[i.id][key] === undefined) {
-    const c = i.choices.find(c => c.id === key);
-    choiceSel[i.id][key] = c.options[0];
-  }
-  return choiceSel[i.id][key];
-};
+const choiceValue = (i, key) => (choiceSel[i.id] && choiceSel[i.id][key]) || "";   // "" = not chosen yet
+const choicesComplete = i => !i.choices || i.choices.every(c => choiceValue(i, c.id));
 const choicesHTML = i => {
   if (!i.choices) return "";
   return '<div class="choices">' + i.choices.map(c => {
     const val = choiceValue(i, c.id);
-    return '<label class="choice-f"><span>' + c.label + '</span><select data-id="' + i.id + '" data-choice="' + c.id + '">' +
+    return '<label class="choice-f"><select data-id="' + i.id + '" data-choice="' + c.id + '" required>' +
+      '<option value=""' + (val ? '' : ' selected') + ' disabled>' + c.label + '</option>' +
       c.options.map(o => '<option' + (o === val ? ' selected' : '') + '>' + o + '</option>').join('') +
       '</select></label>';
   }).join('') + '</div>';
 };
-const choiceText = i => !i.choices ? "" : i.choices.map(c => choiceValue(i, c.id)).join(", ");
+const choiceText = i => !i.choices ? "" : i.choices.map(c => choiceValue(i, c.id) || "?").join(", ");
 const onChoiceChange = e => {
   const sel = e.target.closest("select[data-choice]"); if (!sel) return;
   const id = sel.dataset.id, key = sel.dataset.choice;
   if (!choiceSel[id]) choiceSel[id] = {};
   choiceSel[id][key] = sel.value;
+  if ($("sheet").open) fillSheet();
+  else { $("bar").classList.toggle("on", calc().count > 0); }
 };
 
 // Menu rows
@@ -478,9 +475,14 @@ function calc(){
       // minAlone: least to order only when there is no thali in the order
       const shortAlone = (thalis === 0) ? ITEMS.find(i => i.minAlone !== undefined && qty[i.id] > 0 && qty[i.id] < i.minAlone) : null;
       const short = shortAlways || shortAlone;
+      // Dropdown choices (Rice, filling, ...): every choice must be picked before the order can be sent
+      const unchosen = ITEMS.find(i => qty[i.id] > 0 && i.choices && !choicesComplete(i));
       if (short) {
         if (short.minAlways !== undefined) { problem = short.name + ": please order at least " + short.minAlways + " per order."; barHint = "Add more " + short.name; }
         else { problem = short.name + ": please order at least " + short.minAlone + " when ordering on its own, or add a thali."; barHint = "Add more or a thali"; }
+      } else if (unchosen) {
+        problem = unchosen.name + ": please choose all the options below before sending your order.";
+        barHint = "Choose your options";
       }
     }
   }
