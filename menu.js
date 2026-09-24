@@ -15,7 +15,7 @@ w/* =========================================================
 /* ---- Number, charges and limits ---- */
 const FIRST_ORDER_OFFER = true;
 const FEATURED = {
-  show: falsea,
+  show: false,
   dishes: [
     { id:"rblps", name:"Bhaat, Biulir Dal, Posto", price:89, alone:true, minAlone:2, max:6, },
   ]
