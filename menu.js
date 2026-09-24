@@ -17,7 +17,7 @@ const FIRST_ORDER_OFFER = true;
 const FEATURED = {
   show: true,
   dishes: [
-    { id:"rblps", name:"Bhaat, Biulir Dal, Posto", price:89, alone:true, minAlone:2, max:6 },
+    { id:"rblps", name:"Bhaat, Biulir Dal, Posto", price:89, alone:true, minAlone:2, max:6, soldOut:true },
   ]
 };
 const ORDERS_OPEN = true;
