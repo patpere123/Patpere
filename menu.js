@@ -20,7 +20,7 @@ const FEATURED = {
     { id:"rblps", name:"Bhaat, Biulir Dal, Posto", price:89, alone:true, minAlone:2, max:6, },
   ]
 };
-const ORDERS_OPEN = false;
+const ORDERS_OPEN = true;
 const CLOSED_MESSAGE = "We are closed today. Please check back soon.";
 const UPI_ID = "parna.1707-1@oksbi";
 const UPI_NAME = "Patpere";
