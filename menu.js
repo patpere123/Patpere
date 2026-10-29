@@ -15,9 +15,9 @@
 /* ---- Number, charges and limits ---- */
 const FIRST_ORDER_OFFER = true;
 const FEATURED = {
-  show: false,
+  show: true,
   dishes: [
-    { id:"rblps", name:"Bhaat, Biulir Dal, Posto", price:89, alone:true, minAlone:2, max:6, },
+    { id:"fsfr", name:"Bhetki (Original) Fish Fry", price:140, alone:true, minAlone:2, max:6, },
   ]
 };
 const ORDERS_OPEN = true;
