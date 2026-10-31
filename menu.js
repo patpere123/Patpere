@@ -15,7 +15,7 @@
 /* ---- Number, charges and limits ---- */
 const FIRST_ORDER_OFFER = true;
 const FEATURED = {
-  show: true,
+  show: false,
   dishes: [
     { id:"fsfr", name:"Bhetki (Original) Fish Fry", price:140, alone:true, minAlone:2, max:6, },
   ]
