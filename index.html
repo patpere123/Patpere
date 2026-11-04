@@ -107,6 +107,96 @@ h2 small{font-family:var(--body);font-weight:500;font-size:16px;color:var(--mute
 .combo-cart-unit{display:block;margin:5px 0 0 8px;font-size:13px;line-height:1.45}
 .combo-cart-list{display:block;margin-top:4px}
 .combo-add{display:block;width:100%;margin:9px 0 2px;padding:10px 14px;border-radius:12px;font-weight:700}
+/* Combo cards: compact, consistent mobile layout. Keep every control in its own row. */
+@media (max-width: 600px){
+  .row.curry.combo150,.row.curry.combo270{
+    grid-template-columns:minmax(0,1fr);
+    gap:12px;
+    padding:16px;
+    border-radius:24px;
+    align-items:stretch;
+  }
+  .row.curry.combo150>h3,.row.curry.combo270>h3{
+    grid-column:1;
+    grid-row:auto;
+    width:100%;
+    text-align:center;
+    white-space:normal;
+    overflow-wrap:normal;
+    font-size:21px;
+    line-height:1.2;
+  }
+  /* The decorative food icon is omitted on narrow cards to give controls room. */
+  .row.curry.combo150>.ico,.row.curry.combo270>.ico{display:none}
+  .row.curry.combo150>.mid,.row.curry.combo270>.mid{
+    grid-column:1;
+    grid-row:auto;
+    justify-self:stretch;
+    min-width:0;
+    display:flex;
+    flex-direction:row;
+    justify-content:center;
+    align-items:baseline;
+    flex-wrap:wrap;
+    gap:4px 12px;
+    text-align:center;
+  }
+  .row.curry.combo150 .mid .price,.row.curry.combo270 .mid .price{font-size:25px;line-height:1.2}
+  .row.curry.combo150 .mid .sm2,.row.curry.combo270 .mid .sm2{
+    display:inline;
+    font-size:14px;
+    line-height:1.3;
+    white-space:normal;
+    opacity:.85;
+  }
+  .row.curry.combo150>.stepper,.row.curry.combo270>.stepper{
+    grid-column:1;
+    grid-row:auto;
+    justify-self:center;
+    justify-content:center;
+    gap:18px;
+  }
+  .row.curry.combo150>.stepper button,.row.curry.combo270>.stepper button{width:46px;height:46px}
+  .row.curry.combo150>.choices,.row.curry.combo270>.choices{
+    grid-column:1;
+    grid-row:auto;
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    width:100%;
+    min-width:0;
+    margin:0;
+    gap:9px;
+  }
+  .row.curry.combo150 .choice-f,.row.curry.combo270 .choice-f{display:block;width:100%;min-width:0}
+  .row.curry.combo150 .choice-f select,.row.curry.combo270 .choice-f select{
+    display:block;
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    min-height:48px;
+    font-size:16px;
+  }
+  .row.curry.combo150>.combo-add,.row.curry.combo270>.combo-add{
+    grid-column:1;
+    grid-row:auto;
+    justify-self:stretch;
+    width:100%;
+    min-width:0;
+    min-height:48px;
+    margin:0;
+    padding:10px 12px;
+    font-size:15px;
+    line-height:1.25;
+    white-space:normal;
+    text-align:center;
+    overflow-wrap:normal;
+  }
+}
+@media (max-width:360px){
+  .row.curry.combo150,.row.curry.combo270{padding:13px;gap:10px}
+  .row.curry.combo150>h3,.row.curry.combo270>h3{font-size:19px}
+  .row.curry.combo150>.combo-add,.row.curry.combo270>.combo-add{font-size:14px}
+}
 
 .choice-f select:invalid{color:var(--muted);border-color:var(--turmeric)}
 .row .sm2{display:block;font-size:14px;opacity:.85;font-weight:500}
@@ -391,6 +481,9 @@ const choiceSel = {};
 const comboDraftQty = {};
 const comboLines = {};
 ITEMS.filter(i => i.group === "combo").forEach(i => { comboDraftQty[i.id] = 1; comboLines[i.id] = []; });
+// Each combo product has its own independent per-order limit (e.g. up to 6
+// Chicken/Veg Combos AND up to 6 Mutton Kasha Combos).
+const comboTotalQty = i => (comboLines[i.id] || []).reduce((sum, entry) => sum + entry.qty, 0);
 const choiceValue = (i, key) => (choiceSel[i.id] && choiceSel[i.id][key]) || "";
 const choicesComplete = i => !i.choices || i.choices.every(c => choiceValue(i, c.id));
 const choicesHTML = i => {
@@ -421,8 +514,8 @@ const onComboAdd = e => {
     return true;
   }
   const n = comboDraftQty[item.id] || 1;
-  if (qty[item.id] + n > limitOf(item)) {
-    showNote("You can add maximum " + limitOf(item) + " " + item.name + " plates.");
+  if (comboTotalQty(item) + n > limitOf(item)) {
+    showNote("You can add maximum " + limitOf(item) + " plates of " + item.name + " per order. Other combo types have their own separate limit.");
     return true;
   }
   comboLines[item.id].push({ choices: item.choices.map(c => choiceValue(item, c.id)), qty: n });
@@ -445,7 +538,7 @@ const stepperHTML = i =>
     '<span class="qty" id="q-' + i.id + '" aria-live="polite">' + (i.group === "combo" ? '1' : '0') + '</span>' +
     '<button type="button" aria-label="Add one ' + i.name + '" data-id="' + i.id + '" data-d="1">+</button>' +
   '</div>';
-const rowClass = i => "row " + (i.group === "curry" || i.group === "combo" ? "curry" : i.id) + (isOut(i) ? " sold" : "");
+const rowClass = i => "row " + ((i.group === "curry" || i.group === "combo") ? "curry " : "") + i.id + (isOut(i) ? " sold" : "");
 const rowHTML = i => {
   const off = isOut(i);
   return '<h3>' + i.name + '</h3>' +
@@ -481,7 +574,7 @@ const onStep = e => {
   if (item.group === "combo") {
     const current = comboDraftQty[id] || 1;
     const next = current + Number(b.dataset.d);
-    comboDraftQty[id] = Math.max(1, Math.min(Math.max(1, limitOf(item) - qty[id]), next));
+    comboDraftQty[id] = Math.max(1, Math.min(Math.max(1, limitOf(item) - comboTotalQty(item)), next));
     render();
     return;
   }
@@ -549,7 +642,7 @@ function render(){
     const l = limitOf(i);
     if (qty[i.id] > l) qty[i.id] = l;
     if (i.group === "combo") {
-      let excess = (comboLines[i.id] || []).reduce((n, entry) => n + entry.qty, 0) - qty[i.id];
+      let excess = comboTotalQty(i) - qty[i.id];
       for (let j = comboLines[i.id].length - 1; j >= 0 && excess > 0; j--) {
         const cut = Math.min(comboLines[i.id][j].qty, excess);
         comboLines[i.id][j].qty -= cut;
@@ -562,7 +655,7 @@ function render(){
     const q = $("q-" + i.id); if (!q) return;
     q.textContent = i.group === "combo" ? (comboDraftQty[i.id] || 1) : qty[i.id];
     const plus = document.querySelector('button[data-id="' + i.id + '"][data-d="1"]');
-    if (plus) plus.disabled = i.group === "combo" ? (qty[i.id] + (comboDraftQty[i.id] || 1) >= limitOf(i)) : qty[i.id] >= limitOf(i);
+    if (plus) plus.disabled = i.group === "combo" ? (comboTotalQty(i) + (comboDraftQty[i.id] || 1) >= limitOf(i)) : qty[i.id] >= limitOf(i);
     const minus = document.querySelector('button[data-id="' + i.id + '"][data-d="-1"]');
     if (minus && i.group === "combo") minus.disabled = (comboDraftQty[i.id] || 1) <= 1;
     const m = $("max-" + i.id);
@@ -571,6 +664,7 @@ function render(){
       : (i.id === FIRST_ORDER_ITEM && $("first").checked)
       ? "Max " + (limitOf(i) - 1) + " + your ₹" + FIRST_ORDER_PRICE + " first-order meal"
       : "Max " + limitOf(i) + " per order";
+    if (m && i.group === "combo") m.textContent = (i.minAlways !== undefined ? "Min " + i.minAlways + ", " : "") + "Max " + limitOf(i) + " of this combo per order";
     if (m && stockLeft[i.id] !== undefined && stockLeft[i.id] <= 10) m.textContent += " · only " + stockLeft[i.id] + " left";
   });
   const c = calc();
